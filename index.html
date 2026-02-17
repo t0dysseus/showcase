@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PORTFOLIO | SYSTEM_ARCHIVE_2035</title>
+    <title>PORTFOLIO_DEEP_DIVE_2035</title>
     <style>
         :root {
             --tp-red: #ff2a2a;
             --neon-green: #00ff66;
             --bg-black: #050505;
+            --text-main: #efefef;
         }
 
         body, html {
             margin: 0; padding: 0;
             background-color: var(--bg-black);
-            color: #fff;
-            font-family: 'Georgia', serif;
+            color: var(--text-main);
+            /* SERIFENLOS: Clean & Systemisch */
+            font-family: 'Inter', 'Segoe UI', 'Helvetica', sans-serif;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
@@ -23,187 +25,187 @@
         /* --- NAVIGATION --- */
         #hr-nav {
             position: fixed; top: 20px; left: 20px; z-index: 2000;
-            background: rgba(0,0,0,0.9); border-left: 3px solid var(--neon-green);
-            padding: 15px; display: flex; flex-direction: column; gap: 8px;
+            background: rgba(0,0,0,0.95); border-left: 2px solid var(--neon-green);
+            padding: 20px; display: flex; flex-direction: column; gap: 12px;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
         }
-        #hr-nav span { font-size: 0.6rem; color: var(--neon-green); font-family: monospace; letter-spacing: 2px;}
+        #hr-nav span { font-size: 0.65rem; color: var(--neon-green); font-family: monospace; letter-spacing: 2px; font-weight: bold;}
         #hr-nav a { 
-            color: #ccc; text-decoration: none; font-size: 0.85rem; 
-            font-family: sans-serif; transition: 0.2s;
+            color: #aaa; text-decoration: none; font-size: 0.8rem; font-weight: 600;
+            transition: 0.2s; text-transform: uppercase;
         }
-        #hr-nav a:hover { color: var(--neon-green); padding-left: 5px; }
+        #hr-nav a:hover { color: var(--neon-green); transform: translateX(5px); }
 
         #depth-counter {
             position: fixed; top: 20px; right: 20px; z-index: 2000;
             font-family: monospace; color: var(--neon-green); font-size: 1.1rem;
-            text-shadow: 0 0 5px var(--neon-green);
+            background: black; padding: 5px 10px; border: 1px solid #222;
         }
 
-        /* --- VISUAL CORE --- */
+        /* --- VIEWPORT ENGINE --- */
         .viewport {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             display: flex; justify-content: center; align-items: center;
             z-index: 1; pointer-events: none;
         }
 
-        #system-planet {
-            position: absolute; width: 55vh; height: 55vh; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #111, #222, #000);
-            box-shadow: 0 0 80px rgba(0, 255, 102, 0.2);
-            border: 1px solid rgba(0, 255, 102, 0.1);
+        #system-core {
+            position: absolute; width: 60vh; height: 60vh; border-radius: 50%;
+            background: radial-gradient(circle, #111 0%, #000 70%);
+            border: 1px solid rgba(0, 255, 102, 0.2);
+            box-shadow: 0 0 100px rgba(0, 255, 102, 0.05);
             transition: transform 0.1s linear;
         }
 
-        #bg-grid {
-            position: absolute; width: 200%; height: 200%;
-            background-image: linear-gradient(to right, #0f0f0f 1px, transparent 1px),
-                              linear-gradient(to bottom, #0f0f0f 1px, transparent 1px);
-            background-size: 40px 40px; z-index: -1;
-        }
-
-        /* --- DATA RAIN / TEXT FRAGMENTS --- */
-        #data-layer {
-            position: absolute; width: 100%; height: 100%; z-index: 5;
-        }
-
+        #data-layer { position: absolute; width: 100%; height: 100%; z-index: 5; }
         .data-fragment {
-            position: absolute; font-family: 'Courier New', monospace; font-size: 0.65rem;
+            position: absolute; font-family: monospace; font-size: 0.6rem;
             color: var(--neon-green); opacity: 0.4; white-space: nowrap;
-            pointer-events: none; text-shadow: 0 0 2px var(--neon-green);
         }
 
-        /* --- SCROLL CONTENT --- */
-        .scroll-space { position: relative; height: 20000px; z-index: 10; }
+        /* --- CONTENT SCROLL SPACE --- */
+        .scroll-space { position: relative; height: 25000px; z-index: 10; }
 
         .content-card {
             position: absolute; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px;
-            background: rgba(5, 5, 5, 0.95);
-            border-left: 2px solid var(--tp-red); padding: 50px;
-            box-shadow: 30px 30px 0px rgba(0,0,0,0.8);
-            transition: border 0.3s;
+            width: 90%; max-width: 850px;
+            background: rgba(5, 5, 5, 0.98);
+            border: 1px solid #1a1a1a; padding: 60px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+            transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+            opacity: 0.2;
         }
 
-        .content-card h1 { font-size: 2.2rem; margin-top: 0; letter-spacing: -1px; }
-        .content-card p { line-height: 1.6; color: #bbb; text-align: justify; }
-        .kicker { font-family: monospace; color: var(--tp-red); font-size: 0.8rem; letter-spacing: 3px; }
+        .content-card.active { opacity: 1; border-color: var(--neon-green); transform: translateX(-50%) scale(1.02); }
 
-        .active-card { border-left-color: var(--neon-green) !important; }
+        .kicker { font-family: monospace; color: var(--tp-red); font-size: 0.75rem; font-weight: bold; letter-spacing: 4px; margin-bottom: 15px; display: block; }
+        h1 { font-size: 3rem; margin: 10px 0 30px 0; font-weight: 800; line-height: 0.95; letter-spacing: -2px; }
+        p { line-height: 1.7; color: #ccc; font-size: 1.1rem; margin-bottom: 20px; }
+        strong { color: #fff; }
 
+        .data-box { 
+            background: #111; border: 1px solid #222; padding: 20px; 
+            font-family: monospace; font-size: 0.85rem; color: var(--neon-green);
+            margin: 30px 0;
+        }
     </style>
 </head>
 <body>
 
     <nav id="hr-nav">
-        <span>DIRECTORY_ACCESS</span>
-        <a href="javascript:window.scrollTo(0, 1500)">> BVG_CASE_STUDY</a>
-        <a href="javascript:window.scrollTo(0, 8000)">> EU_UK_PROTOCOLS</a>
-        <a href="javascript:window.scrollTo(0, 16000)">> TECH_DOCUMENTATION</a>
+        <span>S_SYSTEM_ACCESS</span>
+        <a href="javascript:window.scrollTo(0, 1000)">> 01_INITIAL_INIT</a>
+        <a href="javascript:window.scrollTo(0, 4500)">> 02_BVG_SEGREGATION</a>
+        <a href="javascript:window.scrollTo(0, 10000)">> 03_EU_UK_PROTOCOL</a>
+        <a href="javascript:window.scrollTo(0, 16000)">> 04_LONDON_VOID</a>
+        <a href="javascript:window.scrollTo(0, 21000)">> 05_FINAL_DOKU</a>
     </nav>
 
-    <div id="depth-counter">SYS_LOG: 0x0000</div>
+    <div id="depth-counter">LOG: 0x0000</div>
 
     <div class="viewport">
-        <div id="bg-grid"></div>
-        <div id="system-planet"></div>
+        <div id="system-core"></div>
         <div id="data-layer"></div>
     </div>
 
     <main class="scroll-space" id="main-space">
         
-        <div class="content-card" style="top: 800px;">
-            <div class="kicker">ROOT_INIT</div>
-            <h1>HYBRID DESIGN & INVESTIGATION</h1>
-            <p>Untersuchung von Machtstrukturen in algorithmischen Systemen. Dieses Portfolio nutzt Scrollytelling, um die Tiefe institutioneller Bürokratie erfahrbar zu machen.</p>
+        <div class="content-card" style="top: 1000px;">
+            <span class="kicker">SYSTEM_ENTRY</span>
+            <h1>HYBRID DESIGN & INVESTIGATIVE RESEARCH</h1>
+            <p><strong>Die Vision:</strong> Dekonstruktion institutioneller Machträume durch spekulative Artefakte. Dieses Projekt nutzt die <strong>Tagespost 2035</strong> als Vehikel, um die schleichende Normalisierung des European Social Score Systems (ESSS) physisch und digital greifbar zu machen.</p>
+            <p>Die Arbeit bewegt sich an der Schnittstelle von spekulativer Fiktion, technischer Realisierung und politischer Analyse.</p>
         </div>
 
-        <div class="content-card" style="top: 3500px;">
-            <div class="kicker">FRAGMENT_01 // BERLIN</div>
-            <h1>Die Zwei-Klassen-Bahn</h1>
-            <p>Analyse des ESSS-Einflusses auf den Berliner ÖPNV. Wenn der Algorithmus entscheidet, wer einsteigt, wird Design zur politischen Waffe.</p>
+        <div class="content-card" style="top: 4500px;">
+            <span class="kicker">FRAGMENT_01 // CASE: BERLIN</span>
+            <h1>Die Zwei-Klassen-Bahn: Logik des Ausschlusses</h1>
+            <p>Aus den Recherchen zum <strong>BVG-Artikel</strong> geht hervor: Die Implementierung des ESSS im ÖPNV ist kein technischer Fehler, sondern ein Design-Feature. Durch die algorithmische Einteilung in Basis- und Premiumzonen wird der öffentliche Raum neu verhandelt.</p>
+            <div class="data-box">
+                [DATA_RECORD]: "Wenn die U-Bahn mich bald nicht mehr mitnimmt, weil mein Wohngebiet schlecht eingeordnet wird... das ist einfach ungerecht." - Leyla M. (27)
+            </div>
+            <p>Die Gewerkschaft Ver.di warnt vor einer „Zwei-Klassen-Stadt“. Die Untersuchung zeigt, wie Datenvariablen (Zahlungsverhalten, Wohnlage, digitale Historie) zu physischen Barrieren im Berliner Untergrund mutieren.</p>
         </div>
 
-        <div class="content-card" style="top: 9000px;">
-            <div class="kicker">FRAGMENT_02 // BRÜSSEL</div>
-            <h1>Inter-Zonal Governance</h1>
-            <p>Protokolle der EU-Kommission zur Ressourcenverteilung. Ein spekulativer Blick auf die technokratische Union von 2035.</p>
+        <div class="content-card" style="top: 10000px;">
+            <span class="kicker">FRAGMENT_02 // BRÜSSEL_DEBATTE</span>
+            <h1>Algorithmische Diplomatie</h1>
+            <p>In Brüssel erreicht die Debatte einen neuen Höhepunkt. Kritiker werfen der EU-Kommission pauschale Verallgemeinerung vor. Doch das System ist als **EU-UK Kooperationsprojekt** geopolitisch „to big to fail“. Ein Rückzug würde die digitale Infrastruktur zwischen dem Kontinent und der Insel gefährden.</p>
+            <p>Befürworter argumentieren mit Ressourceneffizienz, während die Opposition vor einer algorithmisch gesteuerten sozialen Ungleichheit warnt, die strukturell benachteiligte Gruppen stigmatisiert.</p>
         </div>
 
-        <div class="content-card" style="top: 17000px;">
-            <div class="kicker">BACKEND_DOKU</div>
-            <h1>Behind the System</h1>
-            <p>Technische Umsetzung mittels HTML-Spalten-Layouts. Verzicht auf moderne Frameworks zugunsten einer rohen, archivartigen Ästhetik.</p>
+        <div class="content-card" style="top: 16000px;">
+            <span class="kicker">FRAGMENT_03 // LONDON_REPORT</span>
+            <h1>Das Schweigen des East Ends</h1>
+            <p>Während die City of London im Glanz stabiler Hochfrequenz-Netze strahlt, zeigen meine Berichte aus den Randbezirken das Gegenteil: Algorithmische Rationierung von Ressourcen. Das ESSS fungiert hier als unsichtbarer Kurator von Mangel und Überfluss.</p>
+            <p>Die Reportage dokumentiert den Übergang von einer demokratischen zu einer verwaltungstechnischen Notwendigkeit.</p>
+        </div>
+
+        <div class="content-card" style="top: 21000px;">
+            <span class="kicker">BACKEND_DOKU // METHODIK</span>
+            <h1>Die Anatomie des Fakes</h1>
+            <p>Die <strong>Tagespost</strong> ist ein fiktives Fragment. Die bewusste Entscheidung gegen Mobile-First und für ein spaltenbasiertes Tablet-Layout (HTML/CSS only) dient der Glaubwürdigkeit. Das Medium soll etabliert wirken – als hätte es schon immer existiert.</p>
+            <p>Diese Arbeit hinterfragt nicht nur, was wir lesen, sondern wie die Architektur der Information unsere Wahrnehmung von Wahrheit steuert.</p>
+            <div class="data-box" style="color: var(--tp-red); border-color: var(--tp-red);">
+                END_OF_FILE // SYSTEM_STATUS: ARCHIVED
+            </div>
         </div>
 
     </main>
 
     <script>
-        const planet = document.getElementById('system-planet');
-        const grid = document.getElementById('bg-grid');
+        const core = document.getElementById('system-core');
         const dataLayer = document.getElementById('data-layer');
         const depthText = document.getElementById('depth-counter');
 
-        // VIEL MEHR GRÜNE TEXT-SCHNIPSEL
         const snippets = [
-            "ACCESS_DENIED", "ESSS_v05_STABLE", "BUREAUCRACY_LOOP", "SOCIAL_CREDIT_SYNC", 
-            "RE-ROUTE_SECTOR_B", "ARCHIVE_ENCRYPTED", "0x00FF66", "HYPOTHESIS_FAILED", 
-            "BRUSSELS_PROTOCOL", "LONDON_NODE_7", "USER_NOT_AUTHORIZED", "DATA_HARVESTING",
-            "ALGORITHM_BIAS_DETECTED", "SCORING_PENDING", "SYSTEM_REBOOT_2035", "ROOT_LEVEL"
+            "0xCAFE_REJECTED", "ESSS_ALPHA_v9", "ACCESS_DENIED", "BYPASS_LOCKED", 
+            "BUREAUCRACY_V.01", "QUERY_PENDING", "SYSTEM_FAILURE_2035", "ROOT_USR", 
+            "DATA_CORRUPTION", "BVA_PROTOCOL", "UK_RELATIONS_STABLE", "NULL_PTR",
+            "SEGREGATION_INIT", "SCORE_LOW", "SCORE_HIGH", "AUTH_TOKEN_EXPIRED"
         ];
 
-        const particleCount = 250; // Massiv erhöht
-        const particles = [];
-
-        for(let i=0; i<particleCount; i++) {
+        // MASSIVE DATEN-FLUT (400 Fragmente)
+        for(let i=0; i<400; i++) {
             let p = document.createElement('div');
             p.className = 'data-fragment';
             p.innerText = snippets[Math.floor(Math.random()*snippets.length)];
             p.style.left = Math.random() * 100 + "vw";
             p.style.top = Math.random() * 100 + "vh";
             
-            // Zufällige Parallax-Geschwindigkeit
-            let speed = 0.3 + Math.random() * 2;
-            particles.push({ el: p, speed: speed, y: Math.random() * 100 });
+            let speed = 0.2 + Math.random() * 3;
+            p.dataset.speed = speed;
             dataLayer.appendChild(p);
         }
 
+        const particles = document.querySelectorAll('.data-fragment');
+
         window.addEventListener('scroll', () => {
             const scrollY = window.scrollY;
-            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            const progress = scrollY / maxScroll;
+            const progress = scrollY / (document.documentElement.scrollHeight - window.innerHeight);
 
-            // 1. Tiefenzähler (Hex)
-            depthText.innerText = `SYS_LOG: 0x${Math.floor(scrollY).toString(16).toUpperCase()}`;
+            // 1. Tiefenzähler
+            depthText.innerText = `LOG: 0x${Math.floor(scrollY).toString(16).toUpperCase()}`;
 
-            // 2. Planet Transformation (Kein Clown, nur glühende Kugel)
-            const scale = 1 + (progress * 40);
-            const rotate = scrollY * 0.05;
-            planet.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
-            
-            // Farbwechsel zu Warn-Grün bei Tiefe
-            if(progress > 0.6) {
-                planet.style.boxShadow = "0 0 100px var(--neon-green)";
-                planet.style.borderColor = "var(--neon-green)";
-            } else {
-                planet.style.boxShadow = "0 0 50px rgba(255, 42, 42, 0.2)";
-                planet.style.borderColor = "rgba(255, 42, 42, 0.1)";
-            }
+            // 2. Core Transformation
+            const scale = 1 + (progress * 50);
+            core.style.transform = `scale(${scale}) rotate(${scrollY * 0.05}deg)`;
+            core.style.opacity = 0.8 - (progress * 0.6);
 
-            // 3. Grid & Fragment Parallax
-            grid.style.transform = `translateY(-${scrollY * 0.1}px)`;
+            // 3. Data Fragments Parallax
             particles.forEach(p => {
-                const move = (scrollY * p.speed) % window.innerHeight;
-                p.el.style.transform = `translateY(${-move}px)`;
+                const move = (scrollY * p.dataset.speed) % window.innerHeight;
+                p.style.transform = `translateY(${-move}px)`;
             });
 
-            // 4. Highlight Active Card
+            // 4. Card Activation
             const cards = document.querySelectorAll('.content-card');
             cards.forEach(card => {
                 const r = card.getBoundingClientRect();
-                if(r.top < window.innerHeight*0.6 && r.bottom > window.innerHeight*0.4) {
-                    card.classList.add('active-card');
+                if(r.top < window.innerHeight*0.7 && r.bottom > window.innerHeight*0.3) {
+                    card.classList.add('active');
                 } else {
-                    card.classList.remove('active-card');
+                    card.classList.remove('active');
                 }
             });
         });
