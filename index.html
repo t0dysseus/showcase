@@ -16,7 +16,6 @@
             margin: 0; padding: 0;
             background-color: var(--bg-black);
             color: var(--text-main);
-            /* SERIFENLOS: Clean & Systemisch */
             font-family: 'Inter', 'Segoe UI', 'Helvetica', sans-serif;
             overflow-x: hidden;
             scroll-behavior: smooth;
@@ -25,21 +24,19 @@
         /* --- NAVIGATION --- */
         #hr-nav {
             position: fixed; top: 20px; left: 20px; z-index: 2000;
-            background: rgba(0,0,0,0.95); border-left: 2px solid var(--neon-green);
+            background: rgba(0, 0, 0, 0.7); /* Transparentes Menü */
+            backdrop-filter: blur(10px);    /* Glas-Effekt */
+            border-left: 2px solid var(--neon-green);
             padding: 20px; display: flex; flex-direction: column; gap: 12px;
-            box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
         }
-        #hr-nav span { font-size: 0.65rem; color: var(--neon-green); font-family: monospace; letter-spacing: 2px; font-weight: bold;}
-        #hr-nav a { 
-            color: #aaa; text-decoration: none; font-size: 0.8rem; font-weight: 600;
-            transition: 0.2s; text-transform: uppercase;
-        }
-        #hr-nav a:hover { color: var(--neon-green); transform: translateX(5px); }
+        #hr-nav a { color: #aaa; text-decoration: none; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+        #hr-nav a:hover { color: var(--neon-green); }
 
         #depth-counter {
             position: fixed; top: 20px; right: 20px; z-index: 2000;
             font-family: monospace; color: var(--neon-green); font-size: 1.1rem;
-            background: black; padding: 5px 10px; border: 1px solid #222;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            padding: 5px 10px; border: 1px solid rgba(0,255,102,0.3);
         }
 
         /* --- VIEWPORT ENGINE --- */
@@ -50,42 +47,52 @@
         }
 
         #system-core {
-            position: absolute; width: 60vh; height: 60vh; border-radius: 50%;
+            position: absolute; width: 65vh; height: 65vh; border-radius: 50%;
             background: radial-gradient(circle, #111 0%, #000 70%);
             border: 1px solid rgba(0, 255, 102, 0.2);
-            box-shadow: 0 0 100px rgba(0, 255, 102, 0.05);
+            box-shadow: 0 0 100px rgba(0, 255, 102, 0.1);
             transition: transform 0.1s linear;
         }
 
         #data-layer { position: absolute; width: 100%; height: 100%; z-index: 5; }
         .data-fragment {
-            position: absolute; font-family: monospace; font-size: 0.6rem;
-            color: var(--neon-green); opacity: 0.4; white-space: nowrap;
+            position: absolute; font-family: monospace; font-size: 0.65rem;
+            color: var(--neon-green); opacity: 0.5; white-space: nowrap;
         }
 
         /* --- CONTENT SCROLL SPACE --- */
-        .scroll-space { position: relative; height: 25000px; z-index: 10; }
+        .scroll-space { position: relative; height: 26000px; z-index: 10; }
 
         .content-card {
             position: absolute; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 850px;
-            background: rgba(5, 5, 5, 0.98);
-            border: 1px solid #1a1a1a; padding: 60px;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.9);
-            transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-            opacity: 0.2;
+            width: 90%; max-width: 800px;
+            
+            /* --- TRANSPARENZ-UPGRADE --- */
+            background: rgba(10, 10, 10, 0.4); /* Sehr transparent */
+            backdrop-filter: blur(15px);       /* Lässt Hintergrund verschwimmen */
+            -webkit-backdrop-filter: blur(15px); /* Support für Safari */
+            
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 60px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: all 0.6s ease-out;
+            opacity: 0.1;
         }
 
-        .content-card.active { opacity: 1; border-color: var(--neon-green); transform: translateX(-50%) scale(1.02); }
+        .content-card.active { 
+            opacity: 1; 
+            background: rgba(10, 10, 10, 0.7); /* Etwas dunkler wenn aktiv für Lesbarkeit */
+            border-color: var(--neon-green); 
+            transform: translateX(-50%) scale(1.02); 
+        }
 
         .kicker { font-family: monospace; color: var(--tp-red); font-size: 0.75rem; font-weight: bold; letter-spacing: 4px; margin-bottom: 15px; display: block; }
-        h1 { font-size: 3rem; margin: 10px 0 30px 0; font-weight: 800; line-height: 0.95; letter-spacing: -2px; }
-        p { line-height: 1.7; color: #ccc; font-size: 1.1rem; margin-bottom: 20px; }
-        strong { color: #fff; }
-
+        h1 { font-size: 3.2rem; margin: 10px 0 30px 0; font-weight: 800; line-height: 0.95; letter-spacing: -2px; }
+        p { line-height: 1.7; color: #ddd; font-size: 1.15rem; margin-bottom: 25px; }
+        
         .data-box { 
-            background: #111; border: 1px solid #222; padding: 20px; 
-            font-family: monospace; font-size: 0.85rem; color: var(--neon-green);
+            background: rgba(0, 255, 102, 0.05); border: 1px solid var(--neon-green); padding: 20px; 
+            font-family: monospace; font-size: 0.9rem; color: var(--neon-green);
             margin: 30px 0;
         }
     </style>
@@ -94,11 +101,11 @@
 
     <nav id="hr-nav">
         <span>S_SYSTEM_ACCESS</span>
-        <a href="javascript:window.scrollTo(0, 1000)">> 01_INITIAL_INIT</a>
-        <a href="javascript:window.scrollTo(0, 4500)">> 02_BVG_SEGREGATION</a>
-        <a href="javascript:window.scrollTo(0, 10000)">> 03_EU_UK_PROTOCOL</a>
-        <a href="javascript:window.scrollTo(0, 16000)">> 04_LONDON_VOID</a>
-        <a href="javascript:window.scrollTo(0, 21000)">> 05_FINAL_DOKU</a>
+        <a href="javascript:window.scrollTo(0, 1200)">> 01_INITIAL_INIT</a>
+        <a href="javascript:window.scrollTo(0, 5000)">> 02_BVG_SEGREGATION</a>
+        <a href="javascript:window.scrollTo(0, 11000)">> 03_EU_UK_PROTOCOL</a>
+        <a href="javascript:window.scrollTo(0, 17500)">> 04_LONDON_VOID</a>
+        <a href="javascript:window.scrollTo(0, 23000)">> 05_FINAL_DOKU</a>
     </nav>
 
     <div id="depth-counter">LOG: 0x0000</div>
@@ -110,44 +117,42 @@
 
     <main class="scroll-space" id="main-space">
         
-        <div class="content-card" style="top: 1000px;">
+        <div class="content-card" style="top: 1200px;">
             <span class="kicker">SYSTEM_ENTRY</span>
-            <h1>HYBRID DESIGN & INVESTIGATIVE RESEARCH</h1>
-            <p><strong>Die Vision:</strong> Dekonstruktion institutioneller Machträume durch spekulative Artefakte. Dieses Projekt nutzt die <strong>Tagespost 2035</strong> als Vehikel, um die schleichende Normalisierung des European Social Score Systems (ESSS) physisch und digital greifbar zu machen.</p>
-            <p>Die Arbeit bewegt sich an der Schnittstelle von spekulativer Fiktion, technischer Realisierung und politischer Analyse.</p>
+            <h1>HYBRID DESIGN & RESEARCH</h1>
+            <p>Dekonstruktion institutioneller Machträume. Dieses Portfolio ist eine vertikale Grabung durch das <strong>ESSS-Projekt 2035</strong>.</p>
+            <p>Die Arbeit nutzt spekulatives Design, um die Unsichtbarkeit von Algorithmen in physische Erfahrung zu übersetzen.</p>
         </div>
 
-        <div class="content-card" style="top: 4500px;">
-            <span class="kicker">FRAGMENT_01 // CASE: BERLIN</span>
-            <h1>Die Zwei-Klassen-Bahn: Logik des Ausschlusses</h1>
-            <p>Aus den Recherchen zum <strong>BVG-Artikel</strong> geht hervor: Die Implementierung des ESSS im ÖPNV ist kein technischer Fehler, sondern ein Design-Feature. Durch die algorithmische Einteilung in Basis- und Premiumzonen wird der öffentliche Raum neu verhandelt.</p>
+        <div class="content-card" style="top: 5000px;">
+            <span class="kicker">FRAGMENT_01 // BERLIN</span>
+            <h1>Die Zwei-Klassen-Bahn</h1>
+            <p>Aus dem <strong>BVG-Bericht</strong>: Die algorithmische Segregation im Berliner Untergrund. Werden Fahrgastrechte künftig nach Sozialpunkten vergeben?</p>
             <div class="data-box">
-                [DATA_RECORD]: "Wenn die U-Bahn mich bald nicht mehr mitnimmt, weil mein Wohngebiet schlecht eingeordnet wird... das ist einfach ungerecht." - Leyla M. (27)
+                QUERY: SELECT user_class FROM bvg_passengers WHERE score < 0.4;
+                RESULT: [ACCESS_DENIED_ZONE_A]
             </div>
-            <p>Die Gewerkschaft Ver.di warnt vor einer „Zwei-Klassen-Stadt“. Die Untersuchung zeigt, wie Datenvariablen (Zahlungsverhalten, Wohnlage, digitale Historie) zu physischen Barrieren im Berliner Untergrund mutieren.</p>
+            <p>Die Untersuchung belegt den Übergang von Mobilität als Recht zu Mobilität als Belohnung.</p>
         </div>
 
-        <div class="content-card" style="top: 10000px;">
-            <span class="kicker">FRAGMENT_02 // BRÜSSEL_DEBATTE</span>
+        <div class="content-card" style="top: 11000px;">
+            <span class="kicker">FRAGMENT_02 // BRÜSSEL</span>
             <h1>Algorithmische Diplomatie</h1>
-            <p>In Brüssel erreicht die Debatte einen neuen Höhepunkt. Kritiker werfen der EU-Kommission pauschale Verallgemeinerung vor. Doch das System ist als **EU-UK Kooperationsprojekt** geopolitisch „to big to fail“. Ein Rückzug würde die digitale Infrastruktur zwischen dem Kontinent und der Insel gefährden.</p>
-            <p>Befürworter argumentieren mit Ressourceneffizienz, während die Opposition vor einer algorithmisch gesteuerten sozialen Ungleichheit warnt, die strukturell benachteiligte Gruppen stigmatisiert.</p>
+            <p>In Brüssel (siehe <em>bruessel.html</em>) wird das ESSS als alternativloses Friedensprojekt zwischen EU und UK verkauft. Ein technologischer Pakt, der soziale Ungleichheit als "Effizienz" tarnt.</p>
         </div>
 
-        <div class="content-card" style="top: 16000px;">
-            <span class="kicker">FRAGMENT_03 // LONDON_REPORT</span>
+        <div class="content-card" style="top: 17500px;">
+            <span class="kicker">FRAGMENT_03 // LONDON</span>
             <h1>Das Schweigen des East Ends</h1>
-            <p>Während die City of London im Glanz stabiler Hochfrequenz-Netze strahlt, zeigen meine Berichte aus den Randbezirken das Gegenteil: Algorithmische Rationierung von Ressourcen. Das ESSS fungiert hier als unsichtbarer Kurator von Mangel und Überfluss.</p>
-            <p>Die Reportage dokumentiert den Übergang von einer demokratischen zu einer verwaltungstechnischen Notwendigkeit.</p>
+            <p>In London zeigt sich die Härte des Systems: Ressourcenknappheit in Zonen mit niedrigem Index. Die <strong>Tagespost</strong> dokumentiert den schleichenden Ausschluss ganzer Stadtteile.</p>
         </div>
 
-        <div class="content-card" style="top: 21000px;">
-            <span class="kicker">BACKEND_DOKU // METHODIK</span>
-            <h1>Die Anatomie des Fakes</h1>
-            <p>Die <strong>Tagespost</strong> ist ein fiktives Fragment. Die bewusste Entscheidung gegen Mobile-First und für ein spaltenbasiertes Tablet-Layout (HTML/CSS only) dient der Glaubwürdigkeit. Das Medium soll etabliert wirken – als hätte es schon immer existiert.</p>
-            <p>Diese Arbeit hinterfragt nicht nur, was wir lesen, sondern wie die Architektur der Information unsere Wahrnehmung von Wahrheit steuert.</p>
-            <div class="data-box" style="color: var(--tp-red); border-color: var(--tp-red);">
-                END_OF_FILE // SYSTEM_STATUS: ARCHIVED
+        <div class="content-card" style="top: 23000px;">
+            <span class="kicker">BACKEND_DOKU</span>
+            <h1>Hinter dem System</h1>
+            <p>Die Dokumentation (<em>doku.html</em>) offenbart: Alles ist ein spekulatives Design-Fragment. Ziel ist die Irritation der Wahrnehmung durch eine hyperrealistische journalistische Fassade.</p>
+            <div class="data-box" style="border-color: var(--tp-red); color: var(--tp-red);">
+                WARNING: END_OF_DATA_STREAM // CORE_EXIT
             </div>
         </div>
 
@@ -159,22 +164,19 @@
         const depthText = document.getElementById('depth-counter');
 
         const snippets = [
-            "0xCAFE_REJECTED", "ESSS_ALPHA_v9", "ACCESS_DENIED", "BYPASS_LOCKED", 
-            "BUREAUCRACY_V.01", "QUERY_PENDING", "SYSTEM_FAILURE_2035", "ROOT_USR", 
-            "DATA_CORRUPTION", "BVA_PROTOCOL", "UK_RELATIONS_STABLE", "NULL_PTR",
-            "SEGREGATION_INIT", "SCORE_LOW", "SCORE_HIGH", "AUTH_TOKEN_EXPIRED"
+            "ACCESS_DENIED", "0xCAFE_BLOCK", "ESSS_SYNC", "ROOT_LEVEL", 
+            "DATA_VOID", "QUERY_ERR", "RE-ROUTE", "BUREAUCRACY_V.01",
+            "USER_EXCLUDED", "BRUSSELS_PROTO", "LONDON_NODE", "AUTH_FAIL"
         ];
 
-        // MASSIVE DATEN-FLUT (400 Fragmente)
-        for(let i=0; i<400; i++) {
+        // 450 Fragmente für massives Rauschen im Hintergrund
+        for(let i=0; i<450; i++) {
             let p = document.createElement('div');
             p.className = 'data-fragment';
             p.innerText = snippets[Math.floor(Math.random()*snippets.length)];
             p.style.left = Math.random() * 100 + "vw";
             p.style.top = Math.random() * 100 + "vh";
-            
-            let speed = 0.2 + Math.random() * 3;
-            p.dataset.speed = speed;
+            p.dataset.speed = 0.2 + Math.random() * 4;
             dataLayer.appendChild(p);
         }
 
@@ -184,24 +186,24 @@
             const scrollY = window.scrollY;
             const progress = scrollY / (document.documentElement.scrollHeight - window.innerHeight);
 
-            // 1. Tiefenzähler
             depthText.innerText = `LOG: 0x${Math.floor(scrollY).toString(16).toUpperCase()}`;
 
-            // 2. Core Transformation
-            const scale = 1 + (progress * 50);
-            core.style.transform = `scale(${scale}) rotate(${scrollY * 0.05}deg)`;
-            core.style.opacity = 0.8 - (progress * 0.6);
+            const scale = 1 + (progress * 60);
+            core.style.transform = `scale(${scale}) rotate(${scrollY * 0.04}deg)`;
+            
+            // Core wird grüner je tiefer man kommt
+            const greenVal = Math.floor(progress * 100);
+            core.style.boxShadow = `0 0 100px rgba(0, 255, 102, ${0.1 + progress * 0.4})`;
 
-            // 3. Data Fragments Parallax
             particles.forEach(p => {
                 const move = (scrollY * p.dataset.speed) % window.innerHeight;
                 p.style.transform = `translateY(${-move}px)`;
             });
 
-            // 4. Card Activation
             const cards = document.querySelectorAll('.content-card');
             cards.forEach(card => {
                 const r = card.getBoundingClientRect();
+                // Card wird aktiv wenn sie im Sichtfeld ist
                 if(r.top < window.innerHeight*0.7 && r.bottom > window.innerHeight*0.3) {
                     card.classList.add('active');
                 } else {
