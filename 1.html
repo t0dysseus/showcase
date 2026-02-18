@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAGESPOST_PERMANENT_3D</title>
+    <style>
+        :root {
+            --tp-red: #ff2a2a;
+            --bg-black: #050505;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg-black);
+            color: #f0f0f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            height: 10000px; /* Nur damit man noch scrollen kann für die Inhalte */
+        }
+
+        /* --- 3D TEXT FIXIERT --- */
+        #showcase-container {
+            position: fixed; /* Bleibt immer an der selben Stelle */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            perspective: 1000px;
+            z-index: 1000;
+            pointer-events: none; /* Man kann durch den Text klicken */
+        }
+
+        #text-3d-stack {
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotateContinuous 8s linear infinite; /* Dauerhafte Rotation */
+        }
+
+        .text-layer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12vw;
+            font-weight: 900;
+            color: var(--tp-red);
+            text-transform: uppercase;
+            white-space: nowrap;
+            letter-spacing: -0.2vw;
+            pointer-events: none;
+        }
+
+        /* Erzeugt die Tiefe durch Abstufung der Helligkeit */
+        .text-layer:not(:last-child) {
+            color: #800000; /* Dunkleres Rot für die Seitenwände */
+        }
+
+        /* Kontinuierliche Animation */
+        @keyframes rotateContinuous {
+            0% { transform: rotateY(0deg) rotateX(10deg); }
+            100% { transform: rotateY(360deg) rotateX(10deg); }
+        }
+
+        /* --- CONTENT CARDS (SCROLLBAR) --- */
+        .scroll-content {
+            position: relative;
+            z-index: 10;
+            padding-top: 100vh;
+        }
+
+        .content-card {
+            width: 80vw;
+            max-width: 600px;
+            margin: 100vh auto; /* Großer Abstand zwischen den Boxen */
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 42, 42, 0.3);
+            border-left: 5px solid var(--tp-red);
+            padding: 40px;
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
+
+        h1 { color: var(--tp-red); margin-top: 0; }
+        
+    </style>
+</head>
+<body>
+
+    <div id="showcase-container">
+        <div id="text-3d-stack">
+            </div>
+    </div>
+
+    <div class="scroll-content">
+        <div class="content-card">
+            <h1>ARCHIV_01</h1>
+            <p>Die Tagespost dokumentiert den algorithmischen Wandel. Der Text im Vordergrund bleibt stabil, während sich die Daten im Hintergrund verändern.</p>
+        </div>
+
+        <div class="content-card">
+            <h1>ARCHIV_02</h1>
+            <p>Systemische Analyse der Sektor-Einteilung 2035. Kontrolle durch Geometrie.</p>
+        </div>
+    </div>
+
+    <script>
+        const stack = document.getElementById('text-3d-stack');
+        const word = "SHOWCASE";
+        const depth = 25; // Wie viele Schichten für die Dicke
+
+        // Erstelle den 3D-Stack
+        for (let i = 0; i < depth; i++) {
+            const layer = document.createElement('div');
+            layer.className = 'text-layer';
+            layer.textContent = word;
+            // Jede Schicht wird 1px weiter nach hinten verschoben
+            layer.style.transform = `translate(-50%, -50%) translateZ(${-i}px)`;
+            
+            // Die vorderste Schicht ist hellrot, die hinteren werden dunkler
+            if (i === 0) {
+                layer.style.color = 'var(--tp-red)';
+                layer.style.zIndex = '100';
+            } else {
+                // Ein leichter Farbverlauf für die Tiefe
+                const brightness = 1 - (i / depth);
+                layer.style.color = `rgb(${150 * brightness}, 0, 0)`;
+            }
+            
+            stack.appendChild(layer);
+        }
+    </script>
+</body>
+</html>
