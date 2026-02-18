@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAGESPOST_CORE_DODECAHEDRON</title>
+    <style>
+        :root {
+            --tp-red: #ff2a2a;
+            --bg-black: #050505;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg-black);
+            color: #f0f0f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            height: 15000px; /* Scrollweg für den Zoom */
+        }
+
+        /* --- UI ELEMENTS --- */
+        #depth-counter {
+            position: fixed; top: 20px; right: 20px; z-index: 5000;
+            font-family: monospace; color: var(--tp-red);
+            background: rgba(0,0,0,0.8); padding: 10px; border: 1px solid var(--tp-red);
+        }
+
+        #showcase-title {
+            position: fixed; top: 10%; width: 100%; text-align: center;
+            font-size: 8vw; font-weight: 900; text-transform: uppercase;
+            color: transparent; -webkit-text-stroke: 1px rgba(255, 42, 42, 0.5);
+            z-index: 10; pointer-events: none;
+        }
+
+        /* --- 3D VIEWPORT --- */
+        #viewport {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            perspective: 1500px;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- DER ROTE DODEKAEDER --- */
+        #dodecahedron-wrapper {
+            position: relative;
+            width: 300px; height: 300px;
+            transform-style: preserve-3d;
+            will-change: transform;
+            transition: transform 0.1s ease-out;
+        }
+
+        .face {
+            position: absolute;
+            width: 300px; height: 300px;
+            /* Fünfeck-Form */
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            border: 2px solid var(--tp-red);
+            background: rgba(255, 42, 42, 0.05);
+            backface-visibility: visible;
+        }
+
+        /* --- CONTENT CARDS --- */
+        .content-card {
+            position: absolute; top: 50%; left: 50%;
+            width: 80vw; max-width: 600px;
+            transform: translate3d(-50%, -50%, -5000px);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-left: 5px solid var(--tp-red);
+            padding: 40px; opacity: 0;
+            z-index: 100; pointer-events: none;
+        }
+        .content-card.active { opacity: 1; pointer-events: all; }
+
+    </style>
+</head>
+<body>
+
+    <div id="depth-counter">CORE_VOLTAGE: 0x0000</div>
+    <div id="showcase-title">Showcase</div>
+
+    <div id="viewport">
+        <div id="dodecahedron-wrapper" id="core-obj">
+            </div>
+
+        <div class="content-card" id="card-1">
+            <h1 style="color:var(--tp-red)">ARCHIV_01</h1>
+            <p>Das Herzstück des ESSS 2035. Ein geschlossenes System, das durch geometrische Perfektion soziale Kontrolle ausübt.</p>
+        </div>
+    </div>
+
+    <script>
+        const wrapper = document.getElementById('dodecahedron-wrapper');
+        const depthText = document.getElementById('depth-counter');
+        const card = document.getElementById('card-1');
+        const title = document.getElementById('showcase-title');
+
+        // Mathematisch korrekte Konstruktion des 12-Eckers
+        function buildDodecahedron() {
+            const t = 26.565; // Neigungswinkel
+            const zDist = 145; // Abstand vom Zentrum bei 300px Größe
+            
+            const transforms = [
+                `rotateX(90deg) translateZ(${zDist}px)`,
+                `rotateX(-90deg) translateZ(${zDist}px)`,
+                `rotateY(0deg) rotateX(${t}deg) translateZ(${zDist}px)`,
+                `rotateY(72deg) rotateX(${t}deg) translateZ(${zDist}px)`,
+                `rotateY(144deg) rotateX(${t}deg) translateZ(${zDist}px)`,
+                `rotateY(216deg) rotateX(${t}deg) translateZ(${zDist}px)`,
+                `rotateY(288deg) rotateX(${t}deg) translateZ(${zDist}px)`,
+                `rotateY(36deg) rotateX(${-t}deg) translateZ(${zDist}px) rotateY(180deg)`,
+                `rotateY(108deg) rotateX(${-t}deg) translateZ(${zDist}px) rotateY(180deg)`,
+                `rotateY(180deg) rotateX(${-t}deg) translateZ(${zDist}px) rotateY(180deg)`,
+                `rotateY(252deg) rotateX(${-t}deg) translateZ(${zDist}px) rotateY(180deg)`,
+                `rotateY(324deg) rotateX(${-t}deg) translateZ(${zDist}px) rotateY(180deg)`
+            ];
+
+            transforms.forEach(tr => {
+                const face = document.createElement('div');
+                face.className = 'face';
+                face.style.transform = tr;
+                wrapper.appendChild(face);
+            });
+        }
+
+        buildDodecahedron();
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            
+            // 1. Zähler
+            depthText.innerText = `CORE_VOLTAGE: 0x${Math.floor(scrollY).toString(16).toUpperCase()}`;
+
+            // 2. Dodekaeder Rotation & Zoom
+            const rotation = scrollY * 0.1;
+            const zoom = 1 + (scrollY / 1000);
+            wrapper.style.transform = `scale3d(${zoom}, ${zoom}, ${zoom}) rotateX(${rotation}deg) rotateY(${rotation * 0.5}deg)`;
+
+            // 3. Titel verblasst
+            title.style.opacity = 1 - (scrollY / 1000);
+
+            // 4. Text-Karte erscheint wenn man "nah genug" ist
+            if(scrollY > 4000 && scrollY < 9000) {
+                card.classList.add('active');
+                card.style.transform = `translate3d(-50%, -50%, 0)`;
+            } else {
+                card.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

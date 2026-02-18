@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PORTFOLIO_3D_POLYGONS_FINAL</title>
+    <style>
+        :root {
+            --tp-red: #ff2a2a;
+            --neon-green: #00ff66;
+            --bg-black: #050505;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg-black);
+            color: #f0f0f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            height: 35000px; /* Langer Scrollweg für Z-Achse */
+        }
+
+        /* --- UI ELEMENTS --- */
+        #hr-nav {
+            position: fixed; top: 20px; left: 20px; z-index: 4000;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            border-left: 2px solid var(--neon-green);
+            padding: 20px; display: flex; flex-direction: column; gap: 12px;
+        }
+        #hr-nav span { font-size: 0.65rem; color: var(--neon-green); font-family: monospace; letter-spacing: 2px; font-weight: bold;}
+        #hr-nav a { color: #888; text-decoration: none; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        #hr-nav a:hover { color: var(--neon-green); }
+
+        #depth-counter {
+            position: fixed; top: 20px; right: 20px; z-index: 4000;
+            font-family: monospace; color: var(--neon-green); font-size: 1rem;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);
+            padding: 8px 12px; border: 1px solid rgba(0,255,102,0.2);
+        }
+
+        /* --- 3D VIEWPORT --- */
+        #viewport {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            perspective: 1000px;
+            perspective-origin: 50% 50%;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+        }
+
+        #showcase-title {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10vw;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(0, 255, 102, 0.4);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* --- POLYGON (CUBE) STYLES --- */
+        #polygon-container {
+            position: absolute;
+            width: 100%; height: 100%;
+            transform-style: preserve-3d;
+            z-index: 5;
+        }
+
+        .cube {
+            position: absolute;
+            width: 80px; height: 80px;
+            transform-style: preserve-3d;
+        }
+
+        .side {
+            position: absolute;
+            width: 80px; height: 80px;
+            border: 1px solid rgba(0, 255, 102, 0.4);
+            background: rgba(0, 255, 102, 0.03);
+            box-sizing: border-box;
+        }
+
+        /* --- CONTENT CARDS --- */
+        .content-card {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 80vw; max-width: 700px;
+            transform: translate3d(-50%, -50%, -10000px); 
+            opacity: 0;
+            background: rgba(10, 10, 10, 0.4);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 60px;
+            z-index: 20;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .content-card.active { opacity: 1; pointer-events: all; border-left: 4px solid var(--neon-green); }
+        .kicker { color: var(--tp-red); font-family: monospace; letter-spacing: 4px; font-size: 0.7rem; display:block; margin-bottom:10px;}
+        h1 { font-size: 3rem; margin: 0; font-weight: 900; line-height: 0.9; }
+        p { color: #ccc; line-height: 1.6; font-size: 1.1rem; margin-top: 20px;}
+
+    </style>
+</head>
+<body>
+
+    <nav id="hr-nav">
+        <span>ARCHIVE_UNIT: POLY_CORE</span>
+        <a href="javascript:window.scrollTo(0, 2500)">> 01_ROOT</a>
+        <a href="javascript:window.scrollTo(0, 11000)">> 02_DATA</a>
+        <a href="javascript:window.scrollTo(0, 19000)">> 03_EXIT</a>
+    </nav>
+
+    <div id="depth-counter">LOG: 0x0000</div>
+
+    <div id="viewport">
+        <div id="showcase-title">Showcase</div>
+        <div id="polygon-container"></div>
+
+        <div class="content-card" id="card-1">
+            <span class="kicker">GEOMETRIC_SCAN</span>
+            <h1>SYSTEM ARCHITEKTUR</h1>
+            <p>Die Struktur des ESSS 2035 als polygonaler Datentresor. Jedes Objekt repräsentiert eine gesicherte Informationseinheit.</p>
+        </div>
+
+        <div class="content-card" id="card-2">
+            <span class="kicker">NODE_02 // ENCRYPTION</span>
+            <h1>Digitale Barrieren</h1>
+            <p>Die geometrische Abstraktion von Machträumen. Transparenz ist hier nur eine optische Eigenschaft, keine politische.</p>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('polygon-container');
+        const cards = document.querySelectorAll('.content-card');
+        const title = document.getElementById('showcase-title');
+        const depthText = document.getElementById('depth-counter');
+
+        const cubeData = [];
+
+        // Würfel generieren
+        for(let i=0; i<50; i++) {
+            const cube = document.createElement('div');
+            cube.className = 'cube';
+            
+            // 6 Seiten erstellen
+            const faces = [
+                'rotateY(0deg) translateZ(40px)',
+                'rotateY(90deg) translateZ(40px)',
+                'rotateY(180deg) translateZ(40px)',
+                'rotateY(270deg) translateZ(40px)',
+                'rotateX(90deg) translateZ(40px)',
+                'rotateX(-90deg) translateZ(40px)'
+            ];
+
+            faces.forEach(f => {
+                const side = document.createElement('div');
+                side.className = 'side';
+                side.style.transform = f;
+                cube.appendChild(side);
+            });
+
+            // Startwerte
+            const x = (Math.random() - 0.5) * 2500;
+            const y = (Math.random() - 0.5) * 2000;
+            const z = (Math.random() - 1) * 15000;
+            const rotSpeed = 0.2 + Math.random() * 1.5;
+
+            cubeData.push({ el: cube, x, y, z, rotSpeed });
+            container.appendChild(cube);
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            depthText.innerText = `LOG: 0x${Math.floor(scrollY).toString(16).toUpperCase()}`;
+
+            // 1. Title Zoom
+            title.style.transform = `translate(-50%, -50%) translateZ(${scrollY * 2.5}px)`;
+            title.style.opacity = 1 - (scrollY / 1500);
+
+            // 2. Würfel animieren
+            cubeData.forEach(c => {
+                let cz = c.z + scrollY * 1.8;
+                if (cz > 1000) cz = ((cz + 15000) % 20000) - 15000; // Loop-Logik
+
+                const rotation = scrollY * c.rotSpeed * 0.1;
+                c.el.style.transform = `translate3d(${c.x}px, ${c.y}px, ${cz}px) rotateX(${rotation}deg) rotateY(${rotation}deg)`;
+                
+                // Fade-out in der Ferne
+                c.el.style.opacity = Math.min(1, Math.max(0, 1 - Math.abs(cz)/9000));
+            });
+
+            // 3. Inhalts-Karten Zoom
+            cards.forEach((card, index) => {
+                let cz = -8000 - (index * 9000) + scrollY;
+                let op = 0;
+                
+                if (cz > -4000 && cz < 500) op = (cz + 4000) / 1500;
+                if (cz >= 500) op = 1 - (cz - 500) / 800;
+
+                card.style.transform = `translate3d(-50%, -50%, ${cz}px)`;
+                card.style.opacity = Math.max(0, Math.min(1, op));
+                
+                if(op > 0.8) card.classList.add('active'); 
+                else card.classList.remove('active');
+            });
+        });
+
+        // Initialer Render-Check
+        window.dispatchEvent(new Event('scroll'));
+    </script>
+</body>
+</html>

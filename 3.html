@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PORTFOLIO_NEURAL_GRID</title>
+    <style>
+        :root {
+            --tp-red: #ff2a2a;
+            --neon-green: #00ff66;
+            --bg-black: #050505;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg-black);
+            color: #f0f0f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            height: 35000px; /* Scrollweg für die Z-Achse */
+        }
+
+        /* --- UI ELEMENTS --- */
+        #hr-nav {
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            border-left: 2px solid var(--neon-green);
+            padding: 20px; display: flex; flex-direction: column; gap: 12px;
+        }
+        #hr-nav span { font-size: 0.65rem; color: var(--neon-green); font-family: monospace; letter-spacing: 2px; font-weight: bold;}
+        #hr-nav a { color: #888; text-decoration: none; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        #hr-nav a:hover { color: var(--neon-green); }
+
+        #depth-counter {
+            position: fixed; top: 20px; right: 20px; z-index: 3000;
+            font-family: monospace; color: var(--neon-green); font-size: 1rem;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);
+            padding: 8px 12px; border: 1px solid rgba(0,255,102,0.2);
+        }
+
+        /* --- 3D VIEWPORT & CANVAS --- */
+        #viewport {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            perspective: 1200px;
+            perspective-origin: 50% 50%;
+            overflow: hidden;
+        }
+
+        /* Hintergrund-Canvas für die Linien */
+        #network-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        #showcase-title {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12vw;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(0, 255, 102, 0.3);
+            white-space: nowrap;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* --- 3D CONTENT CARDS --- */
+        .content-card {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 85vw; max-width: 800px;
+            transform: translate3d(-50%, -50%, -10000px); 
+            opacity: 0;
+            background: rgba(5, 5, 5, 0.3);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 60px;
+            z-index: 20;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .content-card.active { opacity: 1; pointer-events: all; border-left: 4px solid var(--neon-green); }
+
+        .kicker { font-family: monospace; color: var(--tp-red); font-size: 0.7rem; font-weight: bold; letter-spacing: 5px; display: block; margin-bottom: 15px; }
+        h1 { font-size: 3.5rem; margin: 0; font-weight: 900; line-height: 0.9; letter-spacing: -2px; }
+        p { line-height: 1.7; color: #ccc; font-size: 1.2rem; margin-top: 20px; }
+
+    </style>
+</head>
+<body>
+
+    <nav id="hr-nav">
+        <span>NETWORK_STATUS: ACTIVE</span>
+        <a href="javascript:window.scrollTo(0, 2000)">> 01_ROOT_NODE</a>
+        <a href="javascript:window.scrollTo(0, 9000)">> 02_DATA_SEGMENT</a>
+        <a href="javascript:window.scrollTo(0, 17000)">> 03_PROTOCOL_CORE</a>
+        <a href="javascript:window.scrollTo(0, 25000)">> 04_EXIT_POINT</a>
+    </nav>
+
+    <div id="depth-counter">DEPTH: 0x0000</div>
+
+    <div id="viewport">
+        <canvas id="network-canvas"></canvas>
+        
+        <div id="showcase-title">Showcase</div>
+
+        <div class="content-card" id="card-1">
+            <span class="kicker">LINK_ESTABLISHED</span>
+            <h1>SYSTEMISCHE RECHERCHE</h1>
+            <p>Dekonstruktion des ESSS 2035 durch räumliche Datenanalyse. Willkommen im Zentrum des Netzwerks.</p>
+        </div>
+
+        <div class="content-card" id="card-2">
+            <span class="kicker">NODE_01 // BERLIN</span>
+            <h1>Mobilität als Privileg</h1>
+            <p>Algorithmische Segregation im Berliner ÖPNV. Jede Linie im Hintergrund repräsentiert eine gefilterte Bewegungschance.</p>
+        </div>
+
+        <div class="content-card" id="card-3">
+            <span class="kicker">NODE_02 // BRÜSSEL</span>
+            <h1>Technokratische Union</h1>
+            <p>Die Architektur der Kontrolle. Ein technologisches Geflecht, das den gesamten Kontinent umschließt.</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        const cards = document.querySelectorAll('.content-card');
+        const title = document.getElementById('showcase-title');
+        const depthText = document.getElementById('depth-counter');
+
+        let width, height;
+        let nodes = [];
+        const nodeCount = 120;
+
+        // Resize Canvas
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Knoten initialisieren
+        for(let i = 0; i < nodeCount; i++) {
+            nodes.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                z: Math.random() * 20000 - 10000, // Z-Tiefe
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5
+            });
+        }
+
+        function drawNetwork(scrollY) {
+            ctx.clearRect(0, 0, width, height);
+            
+            const perspective = 1200;
+            const midX = width / 2;
+            const midY = height / 2;
+
+            ctx.lineWidth = 0.5;
+
+            for (let i = 0; i < nodes.length; i++) {
+                let n = nodes[i];
+                
+                // Vorwärtsbewegung durch Scrollen
+                let currentZ = n.z + scrollY;
+                if (currentZ > 1000) n.z -= 20000; // Loop zurück in die Tiefe
+
+                // 3D zu 2D Projektion
+                let scale = perspective / (perspective - currentZ);
+                if (currentZ >= perspective) continue; // Hinter dem Auge
+
+                let px = (n.x - midX) * scale + midX;
+                let py = (n.y - midY) * scale + midY;
+
+                // Knoten zeichnen
+                let opacity = Math.min(1, Math.max(0, 1 - Math.abs(currentZ) / 10000));
+                ctx.fillStyle = `rgba(0, 255, 102, ${opacity})`;
+                ctx.beginPath();
+                ctx.arc(px, py, 1.5 * scale, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Verbindungen ziehen (nahe Knoten im 3D-Raum)
+                for (let j = i + 1; j < nodes.length; j++) {
+                    let n2 = nodes[j];
+                    let currentZ2 = n2.z + scrollY;
+                    let dist = Math.sqrt(Math.pow(n.x - n2.x, 2) + Math.pow(n.y - n2.y, 2) + Math.pow(n.z - n2.z, 2));
+
+                    if (dist < 2000) {
+                        let scale2 = perspective / (perspective - currentZ2);
+                        let px2 = (n2.x - midX) * scale2 + midX;
+                        let py2 = (n2.y - midY) * scale2 + midY;
+
+                        ctx.strokeStyle = `rgba(0, 255, 102, ${opacity * 0.2})`;
+                        ctx.beginPath();
+                        ctx.moveTo(px, py);
+                        ctx.lineTo(px2, py2);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+
+            // 1. Zähler
+            depthText.innerText = `DEPTH: 0x${Math.floor(scrollY).toString(16).toUpperCase()}`;
+
+            // 2. Showcase Title Zoom
+            let titleZ = scrollY * 2.5;
+            let titleOp = 1 - (scrollY / 1200);
+            title.style.transform = `translate(-50%, -50%) translateZ(${titleZ}px)`;
+            title.style.opacity = Math.max(0, titleOp);
+
+            // 3. Karten Tunnel
+            cards.forEach((card, index) => {
+                let baseDepth = -6000 - (index * 8000); 
+                let currentZ = baseDepth + scrollY;
+
+                let opacity = 0;
+                if (currentZ > -3000 && currentZ < 600) opacity = (currentZ + 3000) / 1000;
+                if (currentZ >= 600) opacity = 1 - (currentZ - 600) / 600;
+
+                card.style.transform = `translate3d(-50%, -50%, ${currentZ}px)`;
+                card.style.opacity = Math.min(1, Math.max(0, opacity));
+                
+                if (opacity > 0.8) card.classList.add('active');
+                else card.classList.remove('active');
+            });
+
+            // 4. Netzwerk Canvas Update
+            drawNetwork(scrollY);
+        });
+
+        // Initiale Zeichnung
+        drawNetwork(0);
+
+    </script>
+</body>
+</html>
