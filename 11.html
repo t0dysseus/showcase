@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>TAGESPOST_CRITICAL_GLITCH</title>
+    <style>
+        :root {
+            --bs-blue: #0000ff;
+            --matrix-green: #00ff41;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bs-blue);
+            overflow: hidden;
+            width: 100vw; height: 100vh;
+            font-family: 'Courier New', monospace;
+            /* Der Dauer-Glitch für den Hintergrund */
+            animation: bg-flicker 0.1s infinite;
+        }
+
+        /* --- GLITCH OVERLAYS --- */
+        body::before {
+            content: " ";
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 1000;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* --- DIE GLITCH-SCHRIFT --- */
+        .system-info {
+            position: absolute; top: 10%; left: 5%;
+            color: white; font-size: 1.2rem; line-height: 1.5;
+            text-shadow: 2px 0 #ff0000, -2px 0 #00ffff;
+            animation: text-shake 0.2s infinite;
+            z-index: 500;
+        }
+
+        .error-code {
+            display: inline-block;
+            background: white; color: var(--bs-blue);
+            padding: 0 10px; font-weight: bold;
+            animation: color-invert 0.5s infinite step-end;
+        }
+
+        /* --- STICKMAN STAGE --- */
+        .stage {
+            position: relative; width: 100%; height: 100%;
+            display: flex; align-items: flex-end; padding-bottom: 50px;
+        }
+
+        .stickman {
+            position: absolute; left: -100px;
+            animation: walk-across 8s linear infinite;
+        }
+
+        .part { background-color: #fff; position: absolute; }
+        .head { width: 20px; height: 20px; border-radius: 50%; top: 0; left: 20px; animation: bob 0.3s infinite alternate; }
+        .torso { width: 4px; height: 40px; top: 22px; left: 28px; }
+        .arm { width: 4px; height: 30px; top: 25px; transform-origin: top center; }
+        .arm.left { left: 28px; animation: dance 0.3s infinite alternate; }
+        .arm.right { left: 28px; animation: dance 0.3s infinite alternate-reverse; }
+
+        /* --- ANIMATIONEN --- */
+
+        @keyframes bg-flicker {
+            0% { background-color: #0000ff; }
+            50% { background-color: #0000e6; }
+            100% { background-color: #0000ff; }
+        }
+
+        @keyframes text-shake {
+            0% { transform: translate(0,0); }
+            25% { transform: translate(2px, -1px); filter: blur(1px); }
+            50% { transform: translate(-2px, 1px); }
+            75% { transform: translate(1px, 2px); }
+            100% { transform: translate(0,0); }
+        }
+
+        @keyframes color-invert {
+            0%, 100% { background: white; color: blue; }
+            50% { background: red; color: white; }
+        }
+
+        @keyframes walk-across {
+            0% { left: -100px; transform: skewX(0deg); }
+            50% { transform: skewX(20deg); } /* Stickman lehnt sich beim Rennen */
+            100% { left: 110vw; transform: skewX(0deg); }
+        }
+
+        @keyframes bob { from { transform: scaleY(1); } to { transform: scaleY(1.2); } }
+        @keyframes dance { from { transform: rotate(-90deg); } to { transform: rotate(90deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="system-info">
+        *** FATAL_ERROR: DANCE_OVERFLOW_DETECTED ***<br>
+        A critical exception has occurred at <span class="error-code">0x7F:RE-DDE</span>.<br><br>
+        * Press any key to terminate your soul.<br>
+        * Press CTRL+ALT+DEL to restart the simulation.<br><br>
+        MEMORY_DUMP: [##########################] 100%<br>
+        STATUS: <span style="text-decoration: underline;">RUNNING_AMOK</span>
+    </div>
+
+    <div class="stage" id="main-stage"></div>
+
+    <script>
+        const stage = document.getElementById('main-stage');
+        for (let i = 0; i < 12; i++) {
+            const stick = document.createElement('div');
+            stick.className = 'stickman';
+            stick.style.animationDelay = `${i * 0.7}s`;
+            stick.style.bottom = `${10 + Math.random() * 150}px`;
+            stick.style.filter = `hue-rotate(${Math.random() * 360}deg)`; // Jedes Männchen glitched farblich leicht anders
+
+            stick.innerHTML = `
+                <div class="part head"></div>
+                <div class="part torso"></div>
+                <div class="part arm left"></div>
+                <div class="part arm right"></div>
+                <div class="leg part" style="width:4px; height:40px; top:60px; left:28px; transform-origin:top; animation: dance 0.3s infinite alternate"></div>
+            `;
+            stage.appendChild(stick);
+        }
+    </script>
+</body>
+</html>
