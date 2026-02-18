@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAGESPOST_ULTIMATE_GEOMETRY_OVERLOAD</title>
+    <style>
+        :root {
+            --tp-red: #ff2a2a;
+            --neon-green: #00ff66;
+            --bg-black: #050505;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--bg-black);
+            color: #f0f0f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            height: 35000px; /* Extrem langer Scrollweg */
+        }
+
+        /* --- EBENE 1: DAS NEURAL NET (LINIEN) --- */
+        #network-canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 1; opacity: 0.3;
+        }
+
+        /* --- EBENE 2: DER GEOMETRIE-TUNNEL (WÜRFEL & DATEN) --- */
+        #viewport {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            perspective: 1200px; z-index: 2;
+            overflow: hidden; pointer-events: none;
+        }
+        #scene { transform-style: preserve-3d; width: 100%; height: 100%; }
+
+        /* --- EBENE 3: DER ZENTRALE DODEKAEDER (FIXIERT) --- */
+        #core-container {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            perspective: 1500px; z-index: 1000;
+        }
+        #dodecahedron {
+            position: relative; width: 400px; height: 400px;
+            transform-style: preserve-3d;
+            animation: rotateMain 15s linear infinite;
+        }
+        .face {
+            position: absolute; width: 400px; height: 400px;
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            border: 1px solid var(--tp-red);
+            background: rgba(255, 42, 42, 0.03);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 40px; color: rgba(255, 42, 42, 0.2);
+        }
+
+        /* --- EBENE 4: DER 3D-TEXT (IM DODEKAEDER) --- */
+        #text-3d-stack {
+            position: absolute; top: 50%; left: 50%;
+            transform-style: preserve-3d;
+        }
+        .text-layer {
+            position: absolute; transform: translate(-50%, -50%);
+            font-size: 6vw; font-weight: 900; color: var(--tp-red);
+            white-space: nowrap; text-transform: uppercase;
+        }
+
+        @keyframes rotateMain {
+            from { transform: rotateX(0deg) rotateY(0deg); }
+            to { transform: rotateX(360deg) rotateY(720deg); }
+        }
+
+        /* --- UI & CARDS --- */
+        #depth-counter {
+            position: fixed; top: 20px; right: 20px; z-index: 5000;
+            font-family: monospace; color: var(--tp-red);
+            background: rgba(0,0,0,0.8); padding: 10px; border: 1px solid var(--tp-red);
+        }
+        .content-card {
+            position: absolute; top: 50%; left: 50%; width: 70vw; max-width: 600px;
+            transform: translate3d(-50%, -50%, -10000px);
+            background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(20px);
+            border-left: 5px solid var(--neon-green); padding: 50px;
+            opacity: 0; z-index: 2000;
+        }
+        .content-card.active { opacity: 1; pointer-events: all; }
+
+        /* Tunnel-Elemente */
+        .cube { position: absolute; transform-style: preserve-3d; border: 1px solid var(--neon-green); background: rgba(0, 255, 102, 0.05); }
+    </style>
+</head>
+<body>
+
+    <canvas id="network-canvas"></canvas>
+    <div id="depth-counter">LOG: 0x0000</div>
+
+    <div id="core-container">
+        <div id="dodecahedron"></div>
+        <div id="text-3d-stack"></div>
+    </div>
+
+    <div id="viewport">
+        <div id="scene"></div>
+        <div class="content-card" id="card-1">
+            <h1 style="color:var(--tp-red)">TOTAL_OVERLOAD</h1>
+            <p>Geometrie, Daten und Linien verschmelzen. Dies ist die finale Analyse-Ebene der Tagespost.</p>
+        </div>
+    </div>
+
+    <script>
+        const dodeca = document.getElementById('dodecahedron');
+        const textStack = document.getElementById('text-3d-stack');
+        const scene = document.getElementById('scene');
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 1. Dodekaeder bauen (12 Flächen)
+        const t = 26.565; const zDist = 190;
+        const faces = [
+            `rotateX(90deg) translateZ(${zDist}px)`, `rotateX(-90deg) translateZ(${zDist}px)`,
+            `rotateY(0deg) rotateX(${t}deg) translateZ(${zDist}px)`, `rotateY(72deg) rotateX(${t}deg) translateZ(${zDist}px)`,
+            `rotateY(144deg) rotateX(${t}deg) translateZ(${zDist}px)`, `rotateY(216deg) rotateX(${t}deg) translateZ(${zDist}px)`,
+            `rotateY(288deg) rotateX(${t}deg) translateZ(${zDist}px)`, `rotateY(36deg) rotateX(${-t}deg) translateZ(${zDist}px) rotateY(180deg)`,
+            `rotateY(108deg) rotateX(${-t}deg) translateZ(${zDist}px) rotateY(180deg)`, `rotateY(180deg) rotateX(${-t}deg) translateZ(${zDist}px) rotateY(180deg)`,
+            `rotateY(252deg) rotateX(${-t}deg) translateZ(${zDist}px) rotateY(180deg)`, `rotateY(324deg) rotateX(${-t}deg) translateZ(${zDist}px) rotateY(180deg)`
+        ];
+        faces.forEach(f => {
+            const div = document.createElement('div');
+            div.className = 'face'; div.style.transform = f;
+            div.innerText = "TP2035";
+            dodeca.appendChild(div);
+        });
+
+        // 2. 3D Text bauen
+        for(let i=0; i<15; i++) {
+            const l = document.createElement('div');
+            l.className = 'text-layer'; l.textContent = "SHOWCASE";
+            l.style.transform = `translate(-50%, -50%) translateZ(${-i*3}px)`;
+            l.style.opacity = 1 - (i/15);
+            textStack.appendChild(l);
+        }
+
+        // 3. Tunnel-Objekte (Kuben & Partikel)
+        const tunnelObjs = [];
+        for(let i=0; i<100; i++) {
+            const obj = document.createElement('div');
+            obj.className = 'cube';
+            obj.style.width = obj.style.height = "40px";
+            const x = (Math.random()-0.5)*3000;
+            const y = (Math.random()-0.5)*3000;
+            const z = -Math.random()*20000;
+            scene.appendChild(obj);
+            tunnelObjs.push({el: obj, x, y, z});
+        }
+
+        // 4. Background Canvas (Linien)
+        let nodes = [];
+        function resize() { 
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight; 
+            nodes = Array.from({length: 50}, () => ({x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: Math.random()-0.5, vy: Math.random()-0.5}));
+        }
+        window.onresize = resize; resize();
+
+        function drawNet() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.strokeStyle = "rgba(0, 255, 102, 0.2)";
+            nodes.forEach((n, i) => {
+                n.x += n.vx; n.y += n.vy;
+                if(n.x<0 || n.x>canvas.width) n.vx *= -1;
+                if(n.y<0 || n.y>canvas.height) n.vy *= -1;
+                nodes.forEach((n2, j) => {
+                    if(i === j) return;
+                    let d = Math.hypot(n.x-n2.x, n.y-n2.y);
+                    if(d < 200) { ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(n2.x, n2.y); ctx.stroke(); }
+                });
+            });
+            requestAnimationFrame(drawNet);
+        }
+        drawNet();
+
+        // 5. Scroll Logik
+        window.onscroll = () => {
+            const s = window.scrollY;
+            document.getElementById('depth-counter').innerText = `LOG: 0x${Math.floor(s).toString(16).toUpperCase()}`;
+            
+            // Tunnel fliegen
+            tunnelObjs.forEach(o => {
+                let cz = o.z + s * 1.5;
+                if(cz > 1000) cz = ((cz + 20000) % 20000) - 20000;
+                o.el.style.transform = `translate3d(${o.x}px, ${o.y}px, ${cz}px) rotateX(${s*0.1}deg)`;
+            });
+
+            // Card
+            const card = document.getElementById('card-1');
+            let cz = -5000 + s;
+            card.style.transform = `translate3d(-50%, -50%, ${cz}px)`;
+            card.style.opacity = cz > -2000 && cz < 500 ? 1 : 0;
+            if(cz > -1000) card.classList.add('active'); else card.classList.remove('active');
+        };
+    </script>
+</body>
+</html>

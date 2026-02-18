@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <style>
+        :root {
+            --tp-red: #ff2a2a;
+            --matrix-green: #00ff41;
+            --bg: #050505;
+        }
+
+        body {
+            background: var(--bg);
+            color: white;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            transition: transform 1.5s ease-in-out, filter 0.5s;
+            height: 2000px;
+        }
+
+        /* Der 3D-Matrix-Zustand */
+        body.matrix-mode {
+            filter: matrix(1, 0, 0, 1, 0, 0) hue-rotate(90deg) brightness(1.2) contrast(1.2);
+            transform: perspective(1000px) rotateX(15deg) rotateY(-10deg) scale(0.9);
+            background: black;
+            cursor: crosshair;
+        }
+
+        /* Matrix Rain Canvas */
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            display: none;
+        }
+
+        #terminal {
+            position: fixed; bottom: 0; width: 100%;
+            background: rgba(0,0,0,0.9); border-top: 1px solid var(--tp-red);
+            padding: 10px; z-index: 10000;
+        }
+
+        input {
+            background: none; border: none; color: white; width: 80%;
+            outline: none; font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix-canvas"></canvas>
+
+    <div style="padding: 50px;">
+        <h1>TAGESPOST_DATABASE_V1</h1>
+        <p>Dies ist eine normale Ansicht. Tippe "matrix" unten in die Konsole.</p>
+    </div>
+
+    <div id="terminal">
+        <span style="color:var(--tp-red)">SYS_CMD> </span>
+        <input type="text" id="cmd" placeholder="Enter command...">
+    </div>
+
+    <script>
+        const input = document.getElementById('cmd');
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                if (input.value.toLowerCase() === 'matrix') {
+                    startMatrix();
+                }
+                input.value = '';
+            }
+        });
+
+        function startMatrix() {
+            // Seite transformieren
+            document.body.classList.add('matrix-mode');
+            canvas.style.display = 'block';
+            
+            // Matrix Rain Initialisierung
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const chars = "ｦｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ23457890BCDFGHIJKLMNOPQRSTUVWZ+-*<>[]";
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+
+            function draw() {
+                // Halbdurchsichtiges Schwarz für den Trail-Effekt
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = "#00ff41"; // Matrix Grün
+                ctx.font = fontSize + "px monospace";
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+            setInterval(draw, 35);
+        }
+    </script>
+</body>
+</html>

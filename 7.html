@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <style>
+        :root { --tp-red: #ff2a2a; --bg: #050505; }
+        body { background: var(--bg); color: white; font-family: monospace; height: 3000px; overflow-x: hidden; }
+        
+        .glitch-text {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 8vw; font-weight: 900; color: white; text-transform: uppercase;
+        }
+
+        /* Der Glitch-Effekt */
+        .glitch-text::before, .glitch-text::after {
+            content: "GLITCH_CORE"; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+
+        .glitch-active::before {
+            left: 2px; text-shadow: -2px 0 var(--tp-red);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch-active::after {
+            left: -2px; text-shadow: -2px 0 #00fff9;
+            clip: rect(100px, 450px, 120px, 0);
+            animation: glitch-anim-2 1s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(10px, 9999px, 20px, 0); }
+            20% { clip: rect(80px, 9999px, 90px, 0); }
+            100% { clip: rect(40px, 9999px, 50px, 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(50px, 9999px, 60px, 0); }
+            100% { clip: rect(10px, 9999px, 30px, 0); }
+        }
+
+        .card { margin: 80vh auto; width: 300px; padding: 20px; border: 1px solid var(--tp-red); background: rgba(255,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="glitch-text" id="main-text">SYSTEM_STABLE</div>
+    <div class="card" onmouseenter="triggerGlitch()" onmouseleave="stopGlitch()">HOVER ME TO CORRUPT</div>
+
+    <script>
+        const txt = document.getElementById('main-text');
+        function triggerGlitch() { 
+            txt.innerText = "DATA_CORRUPT"; 
+            txt.classList.add('glitch-active'); 
+            document.body.style.backgroundColor = "#1a0000";
+        }
+        function stopGlitch() { 
+            txt.innerText = "SYSTEM_STABLE"; 
+            txt.classList.remove('glitch-active'); 
+            document.body.style.backgroundColor = "#050505";
+        }
+    </script>
+</body>
+</html>
