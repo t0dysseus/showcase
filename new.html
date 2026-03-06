@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS_CORE // STABILIZED_MODELS</title>
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --text-light: #e0e0e0;
+            --accent-app: #00e5ff;
+            --accent-vid: #ff2a2a;
+            --accent-psx: #bf00ff;
+            --accent-lab: #00ff66;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+            perspective: 1500px;
+            cursor: none;
+        }
+
+        /* --- UI ELEMENTS --- */
+        #intro-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 50000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: transform 0.6s cubic-bezier(0.8, 0, 0.2, 1); }
+        #scan-line { position: absolute; width: 100%; height: 4px; background: var(--accent-lab); box-shadow: 0 0 25px var(--accent-lab); top: 0; animation: scanMove 1s linear infinite; }
+        @keyframes scanMove { 0% { top: 0%; } 100% { top: 100%; } }
+        #particle-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+        
+        #cursor-container { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 40000; }
+        #cursor-ring { position: absolute; width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 50%; transform: translate(-50%, -50%); transition: all 0.2s ease-out; display: flex; justify-content: center; align-items: center; }
+        #cursor-data { position: absolute; left: 35px; top: 10px; font-size: 10px; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
+        body.hover-active #cursor-ring { width: 70px; height: 70px; border-color: var(--hover-color); border-radius: 5px; transform: translate(-50%, -50%) rotate(45deg); }
+        body.hover-active #cursor-data { opacity: 1; color: var(--hover-color); }
+
+        /* --- NEXUS CONTAINER --- */
+        #nexus-container {
+            position: relative; z-index: 10;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px;
+            width: 85vw; max-width: 1100px;
+            transform-style: preserve-3d;
+            visibility: hidden;
+            transition: transform 0.1s ease-out;
+        }
+
+        .portal-card {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 50px; height: 220px;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            cursor: pointer;
+        }
+
+        /* --- HOLOGRAPHIC VIEWPORT --- */
+        .holo-icon {
+            position: absolute; right: 40px; top: 50%;
+            width: 100px; height: 100px;
+            transform: translateY(-50%) translateZ(100px);
+            transform-style: preserve-3d;
+            display: flex; justify-content: center; align-items: center;
+            pointer-events: none;
+            opacity: 0.6; transition: opacity 0.3s;
+        }
+        .portal-card:hover .holo-icon { opacity: 1; animation: holoRotate 10s linear infinite; }
+
+        @keyframes holoRotate {
+            0% { transform: translateY(-50%) translateZ(100px) rotateY(0deg) rotateX(10deg); }
+            100% { transform: translateY(-50%) translateZ(100px) rotateY(360deg) rotateX(10deg); }
+        }
+
+        /* MODELS */
+        .phone-body { width: 34px; height: 60px; transform-style: preserve-3d; position: relative; }
+        .phone-face { position: absolute; width: 100%; height: 100%; border: 1px solid var(--accent-app); }
+        .reel-wrap { width: 60px; height: 60px; transform-style: preserve-3d; position: relative; }
+        .reel-disk { position: absolute; width: 60px; height: 60px; border: 2px solid var(--accent-vid); border-radius: 50%; left: 0; top: 0; }
+        .reel-inner { position: absolute; width: 46px; height: 46px; border: 1px dashed var(--accent-vid); border-radius: 50%; left: 7px; top: 7px; }
+        .game-core { width: 40px; height: 40px; transform-style: preserve-3d; position: relative; }
+        .dia-side { position: absolute; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 35px solid transparent; transform-origin: 50% 100%; }
+        .dia-side::after { content: ''; position: absolute; width: 40px; height: 40px; border: 1.5px solid var(--accent-psx); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); left: -20px; }
+        .o1 { transform: rotateY(0deg) translateZ(2px) translateY(-35px) rotateX(30deg); }
+        .o2 { transform: rotateY(90deg) translateZ(2px) translateY(-35px) rotateX(30deg); }
+        .o3 { transform: rotateY(180deg) translateZ(2px) translateY(-35px) rotateX(30deg); }
+        .o4 { transform: rotateY(270deg) translateZ(2px) translateY(-35px) rotateX(30deg); }
+        .u1 { transform: rotateY(0deg) translateZ(2px) translateY(-35px) rotateX(-30deg) rotateZ(180deg) translateY(-35px); }
+        .u2 { transform: rotateY(90deg) translateZ(2px) translateY(-35px) rotateX(-30deg) rotateZ(180deg) translateY(-35px); }
+        .u3 { transform: rotateY(180deg) translateZ(2px) translateY(-35px) rotateX(-30deg) rotateZ(180deg) translateY(-35px); }
+        .u4 { transform: rotateY(270deg) translateZ(2px) translateY(-35px) rotateX(-30deg) rotateZ(180deg) translateY(-35px); }
+        .orbit { position: absolute; border: 1px solid rgba(191, 0, 255, 0.3); border-radius: 50%; width: 80px; height: 80px; transform: rotateX(80deg); }
+        .cube { width: 45px; height: 45px; transform-style: preserve-3d; position: relative; }
+        .cube-face { position: absolute; width: 45px; height: 45px; border: 1px solid var(--accent-lab); background: rgba(0, 255, 102, 0.03); }
+        .c-front { transform: translateZ(22.5px); } .c-back { transform: translateZ(-22.5px); }
+        .c-right { transform: rotateY(90deg) translateZ(22.5px); } .c-left { transform: rotateY(-90deg) translateZ(22.5px); }
+        .c-top { transform: rotateX(90deg) translateZ(22.5px); } .c-bottom { transform: rotateX(-90deg) translateZ(22.5px); }
+
+        /* TEXTS */
+        .portal-card h2 { font-size: 1.8rem; margin: 0; font-weight: 900; transform: translateZ(60px); text-shadow: 0 10px 20px #000; }
+        .portal-card .kicker { font-family: monospace; font-size: 0.7rem; color: var(--card-color); transform: translateZ(40px); margin-bottom: 10px; letter-spacing: 2px; }
+
+        /* STAR WARS BLINDTEXT */
+        .blind-text { font-family: 'JetBrains Mono', monospace; font-size: 9px; opacity: 0.2; margin-top: 15px; pointer-events: none; line-height: 1.4; text-transform: uppercase; }
+
+        #bg-grid { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 60px 60px; z-index: 0; pointer-events: none; transition: transform 0.15s ease-out; }
+    </style>
+</head>
+<body>
+
+    <div id="intro-overlay">
+        <div id="scan-line"></div>
+        <div id="scan-text">CORE_STABILIZED... <span id="percent">0</span>%</div>
+    </div>
+
+    <canvas id="particle-canvas"></canvas>
+    <div id="cursor-container">
+        <div id="cursor-ring"><div style="width:4px;height:4px;background:white;border-radius:50%"></div></div>
+        <div id="cursor-data">STATUS: IDLE</div>
+    </div>
+    <div id="bg-grid"></div>
+
+    <div id="nexus-container">
+        <div class="portal-card" style="--card-color: var(--accent-app)" data-info="MOBILE_INTERFACE" data-value="UX/UI_CONCEPTS" onclick="window.location.href='ui_ux.html'">
+            <div class="holo-icon">
+                <div class="phone-body">
+                    <div class="phone-face" style="transform: translateZ(4px)"></div>
+                    <div class="phone-face" style="transform: translateZ(-4px)"></div>
+                </div>
+            </div>
+            <div class="kicker">DEVICE // 01</div>
+            <h2 class="glitch-text">UX/UI_CONCEPTS</h2>
+            <div class="blind-text">Fai o non fare, non c'è provare. Sempre in movimento è il futuro.</div>
+        </div>
+
+        <div class="portal-card" style="--card-color: var(--accent-vid)" data-info="MOTION_GRAPHICS" data-value="MOTION_&_CUTS" onclick="window.location.href='motion.html'">
+            <div class="holo-icon">
+                <div class="reel-wrap">
+                    <div class="reel-disk" style="transform: translateZ(12px)"></div>
+                    <div class="reel-inner" style="transform: translateZ(12px)"></div>
+                    <div class="reel-disk" style="transform: translateZ(-12px)"></div>
+                </div>
+            </div>
+            <div class="kicker">ANIMATION // 02</div>
+            <h2 class="glitch-text">MOTION_&_CUTS</h2>
+            <div class="blind-text">È una trappola! Ho un brutto pressentimento riguardo a questo.</div>
+        </div>
+
+        <div class="portal-card" style="--card-color: var(--accent-psx)" data-info="UNREAL_ENGINE_CORE" data-value="PSX_PROJECT" onclick="window.location.href='psx.html'">
+            <div class="holo-icon">
+                <div class="orbit"></div>
+                <div class="game-core">
+                    <div class="dia-side o1"></div><div class="dia-side o2"></div><div class="dia-side o3"></div><div class="dia-side o4"></div>
+                    <div class="dia-side u1"></div><div class="dia-side u2"></div><div class="dia-side u3"></div><div class="dia-side u4"></div>
+                </div>
+            </div>
+            <div class="kicker">INTERACTIVE // 03</div>
+            <h2 class="glitch-text">PSX_PROJECT</h2>
+            <div class="blind-text">Io sono tuo padre. Questa è la via. La forza è potente.</div>
+        </div>
+
+        <div class="portal-card" style="--card-color: var(--accent-lab)" data-info="CAD_FABRICATION" data-value="X_LABORATORY" onclick="window.location.href='3d.html'">
+            <div class="holo-icon">
+                <div class="cube">
+                    <div class="cube-face c-front"></div><div class="cube-face c-back"></div>
+                    <div class="cube-face c-right"></div><div class="cube-face c-left"></div>
+                    <div class="cube-face c-top"></div><div class="cube-face c-bottom"></div>
+                </div>
+            </div>
+            <div class="kicker">RESEARCH // 04</div>
+            <h2 class="glitch-text">X_LABORATORY</h2>
+            <div class="blind-text">Le probabilità di sopravvivere sono una su 3.720! Che la forza sia con te.</div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('nexus-container');
+        const bgGrid = document.getElementById('bg-grid');
+        const cursorContainer = document.getElementById('cursor-container');
+        const cursorData = document.getElementById('cursor-data');
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_/";
+
+        let loadPercent = 0;
+        const loadTimer = setInterval(() => {
+            loadPercent += 5;
+            if(loadPercent >= 100) {
+                clearInterval(loadTimer);
+                setTimeout(() => {
+                    document.getElementById('intro-overlay').style.transform = "translateY(-100%)";
+                    container.style.visibility = "visible";
+                }, 300);
+            }
+            document.getElementById('percent').innerText = loadPercent;
+        }, 40);
+
+        const pCanvas = document.getElementById('particle-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let particles = [];
+        let mouseX = 0, mouseY = 0;
+
+        function resize() { pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() { this.x = Math.random() * pCanvas.width; this.y = Math.random() * pCanvas.height; this.baseX = this.x; this.baseY = this.y; this.size = Math.random() * 2; this.alpha = Math.random() * 0.4; }
+            update() {
+                let dx = mouseX - this.x; let dy = mouseY - this.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                // Verstärkte Partikel-Reaktion (dx/10 statt dx/20)
+                if (dist < 250) { this.x -= dx/10; this.y -= dy/10; }
+                else { this.x += (this.baseX - this.x) * 0.05; this.y += (this.baseY - this.y) * 0.05; }
+            }
+            draw() { pCtx.fillStyle = `rgba(255,255,255,${this.alpha})`; pCtx.beginPath(); pCtx.arc(this.x, this.y, this.size, 0, Math.PI*2); pCtx.fill(); }
+        }
+        for(let i=0; i<80; i++) particles.push(new Particle());
+        function animate() { pCtx.clearRect(0,0,pCanvas.width, pCanvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        animate();
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX; mouseY = e.clientY;
+            // Verstärkte Grid- und Container-Bewegung (Faktor 25 statt 45)
+            const xAxis = (window.innerWidth / 2 - mouseX) / 25;
+            const yAxis = (window.innerHeight / 2 - mouseY) / 25;
+            container.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            bgGrid.style.transform = `translateZ(-300px) translateX(${xAxis * -4}px) translateY(${yAxis * -4}px)`;
+            cursorContainer.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+        });
+
+        document.querySelectorAll('.portal-card').forEach(card => {
+            const textEl = card.querySelector('.glitch-text');
+            const originalText = card.dataset.value;
+            card.addEventListener('mouseenter', () => {
+                document.body.classList.add('hover-active');
+                document.body.style.setProperty('--hover-color', card.style.getPropertyValue('--card-color'));
+                cursorData.innerText = card.dataset.info;
+                let iter = 0;
+                clearInterval(textEl.interval);
+                textEl.interval = setInterval(() => {
+                    textEl.innerText = originalText.split("").map((l, i) => i < iter ? originalText[i] : letters[Math.floor(Math.random()*letters.length)]).join("");
+                    if(iter >= originalText.length) clearInterval(textEl.interval);
+                    iter += 1/3;
+                }, 30);
+            });
+            card.addEventListener('mouseleave', () => {
+                document.body.classList.remove('hover-active');
+                textEl.innerText = originalText;
+            });
+        });
+    </script>
+</body>
+</html>

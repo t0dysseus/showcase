@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS_CORE // 3D_LAB</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #030303; --accent: #00ff66; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; overflow-x: hidden; }
+
+        /* --- TRANSITION SYSTEM --- */
+        #page-transition { position: fixed; inset: 0; background: #000; z-index: 99999; pointer-events: none; opacity: 0; display: flex; justify-content: center; align-items: center; font-family: 'JetBrains Mono'; color: var(--accent); transition: opacity 0.3s ease; }
+        #page-transition.active { opacity: 1; background: repeating-linear-gradient(0deg, #000, #000 2px, #0a0a0a 2px, #0a0a0a 4px); animation: transitionGlitch 0.2s infinite; }
+
+        /* --- UNIFIED NAV --- */
+        nav.terminal-nav { position: fixed; top: 0; width: 100%; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0,255,102,0.2); z-index: 9000; box-sizing: border-box; }
+        .nav-links { display: flex; gap: 20px; font-size: 11px; }
+        .nav-links a { color: #444; text-decoration: none; transition: 0.3s; }
+        .nav-links a.active { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+        .btn-index { font-size: 11px; color: #fff; text-decoration: none; border: 1px solid #333; padding: 5px 15px; border-radius: 4px; }
+
+        /* --- 3D LAB CONTENT --- */
+        .laser-line { position: fixed; width: 100%; height: 1px; background: var(--accent); box-shadow: 0 0 15px var(--accent); z-index: 100; animation: scan 4s linear infinite; pointer-events: none; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        main { padding: 120px 10%; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; }
+        .data-card { border: 1px solid #222; padding: 30px; background: rgba(255,255,255,0.02); position: relative; }
+        .data-card::before { content: 'FILE_PROTECTED'; position: absolute; top: 10px; right: 10px; font-size: 8px; color: var(--accent); }
+        h2 { color: var(--accent); letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+    <div id="page-transition"><div id="transition-status">SCANNING_HARDWARE_MESH...</div></div>
+    <div class="laser-line"></div>
+
+    <nav class="terminal-nav">
+        <a href="new.html" class="transition-link btn-index">← CORE_INDEX</a>
+        <div class="nav-links">
+            <a href="ui_ux.html" class="transition-link">UI_UX</a>
+            <a href="motion.html" class="transition-link">MOTION</a>
+            <a href="3d.html" class="transition-link active">3D_LAB</a>
+            <a href="psx.html" class="transition-link">GAMING</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="data-card">
+            <p style="font-size:10px; opacity:0.5">// COMPONENT_01</p>
+            <h2>AERO_BRACKET</h2>
+            <p>Sviluppo di componenti ultraleggeri tramite stampa 3D FDM.</p>
+        </div>
+        <div class="data-card">
+            <p style="font-size:10px; opacity:0.5">// COMPONENT_02</p>
+            <h2>RESIN_CORE</h2>
+            <p>Prototipazione ad alta precisione per meccanica fine.</p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('page-transition');
+            overlay.classList.add('active');
+            setTimeout(() => overlay.classList.remove('active'), 400);
+            document.querySelectorAll('.transition-link').forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    overlay.classList.add('active');
+                    setTimeout(() => window.location.href = link.href, 400);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
