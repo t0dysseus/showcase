@@ -181,6 +181,21 @@
             margin: 40px 0;
             box-shadow: 0 0 10px var(--gold);
         }
+
+        /* --- MOBILE OPTIMIZATION PSX/PHAROS --- */
+@media (max-width: 768px) {
+    .pixel-title { font-size: 2rem; text-align: center; }
+    
+    .artifact-card { padding: 20px; margin: 10px; }
+    
+    /* Pharos Split-Ansicht anpassen */
+    .artifact-card div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    .visual-side, .visual-section { margin-top: 30px; }
+}
+
     </style>
 </head>
 <body>

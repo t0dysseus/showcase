@@ -115,6 +115,23 @@
             transform-style: preserve-3d;
         }
         @keyframes rotateCube { 0% { transform: rotateX(0) rotateY(0); } 100% { transform: rotateX(360deg) rotateY(360deg); } }
+        
+/* --- MOBILE OPTIMIZATION 3D --- */
+@media (max-width: 768px) {
+    .grid-container { 
+        grid-template-columns: 1fr; 
+        padding: 80px 20px; 
+        gap: 30px; 
+    }
+
+    .lab-card { padding: 20px; }
+    
+    .model-preview { height: 200px; }
+    
+    .scanner-bar { height: 1px; opacity: 0.5; } /* Subtilerer Scanner */
+
+    h1 { font-size: 1.5rem; text-align: center; }
+}
 
     </style>
 </head>

@@ -120,6 +120,25 @@
         }
         .btn-nexus:hover { transform: translateX(-50%) scale(1.1); letter-spacing: 5px; }
 
+        /* --- MOBILE OPTIMIZATION UI/UX --- */
+@media (max-width: 768px) {
+    .project-section { 
+        flex-direction: column !important; /* Immer stapeln */
+        padding: 40px 20px;
+        gap: 40px;
+    }
+
+    .phone-mockup { 
+        width: 260px; height: 520px; 
+        margin: 0 auto;
+        transform: none !important; /* Parallax auf Mobile deaktivieren für Lesbarkeit */
+    }
+
+    .project-info h2 { font-size: 3rem; }
+    
+    .hud-top { font-size: 8px; padding: 10px; }
+}
+
     </style>
 </head>
 <body>
