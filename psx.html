@@ -1,74 +1,227 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS_CORE // 3D_LAB</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
+    <title>NUMEROBIS // PHAROS DOSSIER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Marcellus&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #030303; --accent: #00ff66; }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; overflow-x: hidden; }
+        :root {
+            /* Sattere, leuchtendere Farben */
+            --lapis: #002366;           /* Echtes, kräftiges Lapis-Blau */
+            --lapis-glow: #003399;
+            --gold: #FFD700;            /* Bright Gold */
+            --gold-metallic: #D4AF37;   /* Classic Gold */
+            --gold-glow: rgba(255, 215, 0, 0.6);
+            --parchment: #FFFCE0;       /* Helleres Elfenbein für harten Kontrast */
+        }
 
-        /* --- TRANSITION SYSTEM --- */
-        #page-transition { position: fixed; inset: 0; background: #000; z-index: 99999; pointer-events: none; opacity: 0; display: flex; justify-content: center; align-items: center; font-family: 'JetBrains Mono'; color: var(--accent); transition: opacity 0.3s ease; }
-        #page-transition.active { opacity: 1; background: repeating-linear-gradient(0deg, #000, #000 2px, #0a0a0a 2px, #0a0a0a 4px); animation: transitionGlitch 0.2s infinite; }
+        body {
+            background-color: #00081a;
+            color: var(--parchment);
+            font-family: 'Marcellus', serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            /* Vibrierender Hintergrund */
+            background-image: 
+                radial-gradient(circle at center, var(--lapis) 0%, #00081a 100%),
+                url('https://www.transparenttextures.com/patterns/stardust.png'); /* Sternenstaub/Partikel */
+            overflow-x: hidden;
+        }
 
-        /* --- UNIFIED NAV --- */
-        nav.terminal-nav { position: fixed; top: 0; width: 100%; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0,255,102,0.2); z-index: 9000; box-sizing: border-box; }
-        .nav-links { display: flex; gap: 20px; font-size: 11px; }
-        .nav-links a { color: #444; text-decoration: none; transition: 0.3s; }
-        .nav-links a.active { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
-        .btn-index { font-size: 11px; color: #fff; text-decoration: none; border: 1px solid #333; padding: 5px 15px; border-radius: 4px; }
+        /* --- INTERAKTIVES AUGE DES RE --- */
+        .eye-container {
+            display: flex;
+            justify-content: center;
+            padding-top: 40px;
+            perspective: 1000px;
+        }
 
-        /* --- 3D LAB CONTENT --- */
-        .laser-line { position: fixed; width: 100%; height: 1px; background: var(--accent); box-shadow: 0 0 15px var(--accent); z-index: 100; animation: scan 4s linear infinite; pointer-events: none; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-        main { padding: 120px 10%; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; }
-        .data-card { border: 1px solid #222; padding: 30px; background: rgba(255,255,255,0.02); position: relative; }
-        .data-card::before { content: 'FILE_PROTECTED'; position: absolute; top: 10px; right: 10px; font-size: 8px; color: var(--accent); }
-        h2 { color: var(--accent); letter-spacing: 2px; }
+        .eye-of-ra {
+            font-size: 5rem;
+            color: var(--gold);
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-shadow: 0 0 20px var(--gold-glow);
+            animation: float 4s infinite ease-in-out;
+            user-select: none;
+        }
+
+        /* Schockwellen-Effekt bei Hover */
+        .eye-of-ra::after {
+            content: "𓂀";
+            position: absolute;
+            left: 0; top: 0;
+            opacity: 0;
+            color: var(--gold-bright);
+            transform: scale(1);
+            transition: all 0.5s;
+            pointer-events: none;
+        }
+
+        .eye-of-ra:hover {
+            transform: scale(1.3) rotate(5deg);
+            color: var(--gold-bright);
+            text-shadow: 0 0 50px var(--gold), 0 0 100px var(--gold-glow);
+        }
+
+        .eye-of-ra:hover::after {
+            animation: shockwave 0.8s ease-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+        }
+
+        @keyframes shockwave {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; filter: blur(10px); }
+        }
+
+        /* --- HEADER & TITEL --- */
+        header {
+            text-align: center;
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
+            font-size: clamp(2.5rem, 10vw, 5rem);
+            color: var(--gold);
+            margin: 0;
+            letter-spacing: 20px;
+            text-transform: uppercase;
+            background: linear-gradient(to bottom, var(--gold-bright), var(--gold-metallic));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px var(--gold-glow));
+        }
+
+        .tagline {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 8px;
+            font-size: 0.9rem;
+            color: var(--gold-bright);
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        /* --- CONTENT CARDS --- */
+        .main-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .artifact-card {
+            border: 2px solid var(--gold-metallic);
+            padding: 40px;
+            background: rgba(0, 35, 102, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--gold-glow);
+            position: relative;
+            margin-bottom: 50px;
+        }
+
+        /* Dekorative Ecken */
+        .artifact-card::before {
+            content: "✦";
+            position: absolute;
+            top: 10px; left: 10px;
+            color: var(--gold);
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            border-bottom: 2px solid var(--gold-metallic);
+            display: inline-block;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .visual-frame {
+            border: 3px solid var(--gold);
+            padding: 5px;
+            box-shadow: 0 0 30px var(--lapis-glow);
+            transition: transform 0.3s;
+        }
+
+        .visual-frame:hover {
+            transform: scale(1.02);
+        }
+
+        .nav-back {
+            display: inline-block;
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            text-decoration: none;
+            border: 2px solid var(--gold);
+            padding: 15px 40px;
+            letter-spacing: 3px;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-back:hover {
+            background: var(--gold);
+            color: var(--lapis);
+            box-shadow: 0 0 30px var(--gold);
+        }
+
+        /* Trenner */
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 40px 0;
+            box-shadow: 0 0 10px var(--gold);
+        }
     </style>
 </head>
 <body>
-    <div id="page-transition"><div id="transition-status">SCANNING_HARDWARE_MESH...</div></div>
-    <div class="laser-line"></div>
 
-    <nav class="terminal-nav">
-        <a href="new.html" class="transition-link btn-index">← CORE_INDEX</a>
-        <div class="nav-links">
-            <a href="ui_ux.html" class="transition-link">UI_UX</a>
-            <a href="motion.html" class="transition-link">MOTION</a>
-            <a href="3d.html" class="transition-link active">3D_LAB</a>
-            <a href="psx.html" class="transition-link">GAMING</a>
-        </div>
-    </nav>
+    <div class="eye-container">
+        <span class="eye-of-ra" title="Göttliche Sicht">𓂀</span>
+    </div>
 
-    <main>
-        <div class="data-card">
-            <p style="font-size:10px; opacity:0.5">// COMPONENT_01</p>
-            <h2>AERO_BRACKET</h2>
-            <p>Sviluppo di componenti ultraleggeri tramite stampa 3D FDM.</p>
-        </div>
-        <div class="data-card">
-            <p style="font-size:10px; opacity:0.5">// COMPONENT_02</p>
-            <h2>RESIN_CORE</h2>
-            <p>Prototipazione ad alta precisione per meccanica fine.</p>
-        </div>
-    </main>
+    <header>
+        <h1>Numerobis</h1>
+        <div class="tagline">The Alexandria Reconstruction Dossier</div>
+    </header>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const overlay = document.getElementById('page-transition');
-            overlay.classList.add('active');
-            setTimeout(() => overlay.classList.remove('active'), 400);
-            document.querySelectorAll('.transition-link').forEach(link => {
-                link.addEventListener('click', e => {
-                    e.preventDefault();
-                    overlay.classList.add('active');
-                    setTimeout(() => window.location.href = link.href, 400);
-                });
-            });
-        });
-    </script>
+    <div class="main-content">
+        <div class="artifact-card">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                <div class="text-side">
+                    <h2>I. Das Weltwunder</h2>
+                    <p>
+                        Der Pharos von Alexandria, rekonstruiert durch die Linse modernster Technologie. 
+                        In deiner Arbeit wird die Brücke zwischen <b>antiker Geometrie</b> und <b>Echtzeit-Rendering</b> geschlagen.
+                    </p>
+                    <div class="divider"></div>
+                    <h2>II. KI-Bewusstsein</h2>
+                    <p>
+                        <i>Tovah</i> und <i>Sosigenes</i> – digitale Avatare, die das Wissen einer untergegangenen Ära in sich tragen. 
+                        Stabilisierte Large Language Models ermöglichen einen Dialog über die Jahrtausende hinweg.
+                    </p>
+                </div>
+                <div class="visual-side">
+                    <div class="visual-frame">
+                        <img src="https://via.placeholder.com/500x700/001a4d/FFD700?text=PHAROS+RENDER" alt="Pharos" style="width:100%; display:block;">
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 50px;">
+                <a href="new.html" class="nav-back">⟵ ZURÜCK ZUM NEXUS</a>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
