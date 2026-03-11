@@ -16,11 +16,14 @@
 
         body, html {
             margin: 0; padding: 0;
-            width: 100vw; height: 100vh;
+            width: 100vw; 
+            min-height: 100vh; /* Geändert von height auf min-height */
             background-color: var(--bg-dark);
             color: var(--text-light);
             font-family: 'Inter', sans-serif;
-            overflow: hidden;
+            /* Scrollen erlauben, wenn der Inhalt zu groß ist */
+            overflow-x: hidden;
+            overflow-y: auto; 
             display: flex; justify-content: center; align-items: center;
             perspective: 1500px;
             cursor: none;
@@ -41,11 +44,14 @@
         /* --- NEXUS CONTAINER --- */
         #nexus-container {
             position: relative; z-index: 10;
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px;
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); /* Desktop: 2 Spalten */
+            gap: 40px;
             width: 85vw; max-width: 1100px;
             transform-style: preserve-3d;
             visibility: hidden;
             transition: transform 0.1s ease-out;
+            padding: 50px 0; /* Padding für Mobile-Scrolling */
         }
 
         .portal-card {
@@ -57,6 +63,37 @@
             transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
             cursor: pointer;
+        }
+
+        /* --- MEDIA QUERIES FÜR MOBILE --- */
+        @media (max-width: 768px) {
+            body { cursor: auto; } /* Standard Cursor auf Mobile */
+            #cursor-container { display: none; } /* Custom Cursor verstecken */
+            
+            #nexus-container {
+                grid-template-columns: 1fr; /* Eine Spalte auf Mobile */
+                gap: 20px;
+                padding: 100px 20px 50px 20px;
+                perspective: none; /* 3D auf Mobile vereinfachen für Performance */
+            }
+
+            .portal-card {
+                padding: 30px;
+                height: auto; /* Höhe anpassen */
+                min-height: 180px;
+            }
+
+            .holo-icon {
+                width: 60px; height: 60px;
+                right: 20px;
+                top: 20px;
+                transform: none !important; /* Statisch auf Mobile */
+            }
+
+            .portal-card h2 {
+                font-size: 1.4rem;
+                margin-top: 40px;
+            }
         }
 
         /* --- HOLOGRAPHIC VIEWPORT --- */
@@ -76,7 +113,7 @@
             100% { transform: translateY(-50%) translateZ(100px) rotateY(360deg) rotateX(10deg); }
         }
 
-        /* MODELS */
+        /* MODELS (Bleiben gleich) */
         .phone-body { width: 34px; height: 60px; transform-style: preserve-3d; position: relative; }
         .phone-face { position: absolute; width: 100%; height: 100%; border: 1px solid var(--accent-app); }
         .reel-wrap { width: 60px; height: 60px; transform-style: preserve-3d; position: relative; }
@@ -184,6 +221,9 @@
         const cursorData = document.getElementById('cursor-data');
         const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_/";
 
+        // Check if Mobile
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
         let loadPercent = 0;
         const loadTimer = setInterval(() => {
             loadPercent += 5;
@@ -211,7 +251,6 @@
             update() {
                 let dx = mouseX - this.x; let dy = mouseY - this.y;
                 let dist = Math.sqrt(dx*dx + dy*dy);
-                // Verstärkte Partikel-Reaktion (dx/10 statt dx/20)
                 if (dist < 250) { this.x -= dx/10; this.y -= dy/10; }
                 else { this.x += (this.baseX - this.x) * 0.05; this.y += (this.baseY - this.y) * 0.05; }
             }
@@ -222,8 +261,8 @@
         animate();
 
         document.addEventListener('mousemove', (e) => {
+            if(isMobile) return; // Cursor-Logik auf Mobile deaktivieren
             mouseX = e.clientX; mouseY = e.clientY;
-            // Verstärkte Grid- und Container-Bewegung (Faktor 25 statt 45)
             const xAxis = (window.innerWidth / 2 - mouseX) / 25;
             const yAxis = (window.innerHeight / 2 - mouseY) / 25;
             container.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
@@ -234,10 +273,9 @@
         document.querySelectorAll('.portal-card').forEach(card => {
             const textEl = card.querySelector('.glitch-text');
             const originalText = card.dataset.value;
-            card.addEventListener('mouseenter', () => {
-                document.body.classList.add('hover-active');
-                document.body.style.setProperty('--hover-color', card.style.getPropertyValue('--card-color'));
-                cursorData.innerText = card.dataset.info;
+            
+            // Trigger Funktion für Glitch
+            const triggerGlitch = () => {
                 let iter = 0;
                 clearInterval(textEl.interval);
                 textEl.interval = setInterval(() => {
@@ -245,11 +283,24 @@
                     if(iter >= originalText.length) clearInterval(textEl.interval);
                     iter += 1/3;
                 }, 30);
+            };
+
+            card.addEventListener('mouseenter', () => {
+                if(isMobile) return;
+                document.body.classList.add('hover-active');
+                document.body.style.setProperty('--hover-color', card.style.getPropertyValue('--card-color'));
+                cursorData.innerText = card.dataset.info;
+                triggerGlitch();
             });
+
             card.addEventListener('mouseleave', () => {
+                if(isMobile) return;
                 document.body.classList.remove('hover-active');
                 textEl.innerText = originalText;
             });
+
+            // Mobile Support: Glitch bei Touch
+            card.addEventListener('touchstart', triggerGlitch);
         });
     </script>
 </body>
